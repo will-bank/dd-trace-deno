@@ -1,0 +1,96 @@
+import {
+  GIT_BRANCH,
+  GIT_COMMIT_AUTHOR_DATE,
+  GIT_COMMIT_AUTHOR_EMAIL,
+  GIT_COMMIT_AUTHOR_NAME,
+  GIT_COMMIT_COMMITTER_DATE,
+  GIT_COMMIT_COMMITTER_EMAIL,
+  GIT_COMMIT_COMMITTER_NAME,
+  GIT_COMMIT_MESSAGE,
+  GIT_COMMIT_SHA,
+  GIT_REPOSITORY_URL,
+  GIT_TAG,
+} from './tags.ts';
+
+import { normalizeRef } from './ci.ts';
+import { URL } from 'node:url';
+
+function removeEmptyValues(tags: object) {
+  return Object.keys(tags).reduce((filteredTags, tag) => {
+
+    if (!tags[tag]) {
+      return filteredTags;
+    }
+    return {
+      ...filteredTags,
+
+      [tag]: tags[tag],
+    };
+  }, {});
+}
+
+function filterSensitiveInfoFromRepository(repositoryUrl: string | URL) {
+  try {
+
+    if (repositoryUrl.startsWith('git@')) {
+      return repositoryUrl;
+    }
+    const { protocol, hostname, pathname } = new URL(repositoryUrl);
+
+    return `${protocol}//${hostname}${pathname}`;
+  } catch (e) {
+    return repositoryUrl;
+  }
+}
+
+// The regex is extracted from
+// https://github.com/jonschlinkert/is-git-url/blob/396965ffabf2f46656c8af4c47bef1d69f09292e/index.js#L9C15-L9C87
+function validateGitRepositoryUrl(repoUrl: string) {
+  return /(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|#[-\d\w._]+?)$/.test(repoUrl);
+}
+
+function validateGitCommitSha(gitCommitSha: string) {
+  const isValidSha1 = /^[0-9a-f]{40}$/.test(gitCommitSha);
+  const isValidSha256 = /^[0-9a-f]{64}$/.test(gitCommitSha);
+  return isValidSha1 || isValidSha256;
+}
+
+function getUserProviderGitMetadata() {
+  const {
+    DD_GIT_COMMIT_SHA,
+    DD_GIT_BRANCH,
+    DD_GIT_REPOSITORY_URL,
+    DD_GIT_TAG,
+    DD_GIT_COMMIT_MESSAGE,
+    DD_GIT_COMMIT_COMMITTER_NAME,
+    DD_GIT_COMMIT_COMMITTER_EMAIL,
+    DD_GIT_COMMIT_COMMITTER_DATE,
+    DD_GIT_COMMIT_AUTHOR_NAME,
+    DD_GIT_COMMIT_AUTHOR_EMAIL,
+    DD_GIT_COMMIT_AUTHOR_DATE,
+  } = Deno.env.toObject();
+
+  const branch = normalizeRef(DD_GIT_BRANCH);
+  let tag = normalizeRef(DD_GIT_TAG);
+
+  // if DD_GIT_BRANCH is a tag, we associate its value to TAG too
+  if ((DD_GIT_BRANCH || '').includes('origin/tags') || (DD_GIT_BRANCH || '').includes('refs/heads/tags')) {
+    tag = normalizeRef(DD_GIT_BRANCH);
+  }
+
+  return removeEmptyValues({
+    [GIT_COMMIT_SHA]: DD_GIT_COMMIT_SHA,
+    [GIT_BRANCH]: branch,
+    [GIT_REPOSITORY_URL]: filterSensitiveInfoFromRepository(DD_GIT_REPOSITORY_URL),
+    [GIT_TAG]: tag,
+    [GIT_COMMIT_MESSAGE]: DD_GIT_COMMIT_MESSAGE,
+    [GIT_COMMIT_COMMITTER_NAME]: DD_GIT_COMMIT_COMMITTER_NAME,
+    [GIT_COMMIT_COMMITTER_DATE]: DD_GIT_COMMIT_COMMITTER_DATE,
+    [GIT_COMMIT_COMMITTER_EMAIL]: DD_GIT_COMMIT_COMMITTER_EMAIL,
+    [GIT_COMMIT_AUTHOR_NAME]: DD_GIT_COMMIT_AUTHOR_NAME,
+    [GIT_COMMIT_AUTHOR_EMAIL]: DD_GIT_COMMIT_AUTHOR_EMAIL,
+    [GIT_COMMIT_AUTHOR_DATE]: DD_GIT_COMMIT_AUTHOR_DATE,
+  });
+}
+
+export { getUserProviderGitMetadata, validateGitCommitSha, validateGitRepositoryUrl };

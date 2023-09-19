@@ -1,0 +1,28 @@
+[
+    {
+        "files": {
+            "renameExtensions": true
+        },
+        "fixes": {
+            "importExtensions": true
+        },
+        "include": [
+            "packages/*/src/**/*.{js,jsx}"
+        ],
+        "project": "./tsconfig.json"
+    },
+    {
+        "fixes": {
+            "incompleteTypes": true,
+            "missingProperties": true,
+            "noImplicitAny": true
+        },
+        "cleanups": {
+            "suppressTypeErrors": true
+        },
+        "include": [
+            "packages/*/src/**/*.{ts,tsx}"
+        ],
+        "project": "./tsconfig.json"
+    }
+]

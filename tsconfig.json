@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "declarationMap": true,
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "module": "nodenext",
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "es2020"
+    },
+    "include": [
+        "src"
+    ]
+}
