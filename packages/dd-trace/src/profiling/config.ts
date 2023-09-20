@@ -1,4 +1,4 @@
-import coalesce from 'npm:koalas';
+import coalesce from 'npm:koalas@1.0.2';
 import os from 'node:os';
 import path from 'node:path';
 import { format, pathToFileURL, URL } from 'node:url';

@@ -1,11 +1,11 @@
-// @deno-types="npm:@types/lodash/uniq.d.ts"
-import uniq from 'npm:lodash/uniq.js';
+// @deno-types="npm:@types/lodash@4.14.197/uniq.d.ts"
+import uniq from 'npm:lodash@4.17.21/uniq.js';
 import * as analyticsSampler from '../../analytics_sampler.ts';
 const FORMAT_HTTP_HEADERS = 'http_headers';
 import log from '../../log/index.ts';
-import * as tags from 'npm:dd-trace/ext/tags.js';
-import * as types from 'npm:dd-trace/ext/types.js';
-import * as kinds from 'npm:dd-trace/ext/kinds.js';
+import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
+import * as types from 'npm:dd-trace@4.13.1/ext/types.js';
+import * as kinds from 'npm:dd-trace@4.13.1/ext/kinds.js';
 import urlFilter from './urlfilter.ts';
 import { extractIp } from './ip_extractor.ts';
 import { ERROR_MESSAGE, ERROR_STACK, ERROR_TYPE } from '../../constants.ts';

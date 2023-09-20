@@ -1,4 +1,4 @@
-import * as exporters from 'npm:dd-trace/ext/exporters.js';
+import * as exporters from 'npm:dd-trace@4.13.1/ext/exporters.js';
 import fs from 'node:fs';
 import * as constants from './constants.ts';
 

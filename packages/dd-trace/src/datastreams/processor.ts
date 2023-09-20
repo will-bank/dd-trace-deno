@@ -1,8 +1,8 @@
 import os from 'node:os';
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' }; // Message pack int encoding is done in big endian, but data streams uses little endian
-import { type Uint64BE as Uint64 } from 'npm:int64-buffer';
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' }; // Message pack int encoding is done in big endian, but data streams uses little endian
+import { type Uint64BE as Uint64 } from 'npm:int64-buffer@0.1.10';
 
-import { LogCollapsingLowestDenseDDSketch } from 'npm:@datadog/sketches-js';
+import { LogCollapsingLowestDenseDDSketch } from 'npm:@datadog/sketches-js@2.1.0';
 
 import { DataStreamsWriter } from './writer.ts';
 import { computePathwayHash } from './pathway.ts';

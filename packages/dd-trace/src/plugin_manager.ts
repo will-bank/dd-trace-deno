@@ -1,4 +1,4 @@
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 import { isFalse } from './util.ts';
 import plugins from './plugins/index.ts';
 import log from './log/index.ts';
@@ -28,7 +28,7 @@ loadChannel.subscribe(({ name }) => {
 });
 
 // Globals
-maybeEnable(await import('npm:dd-trace/packages/datadog-plugin-fetch/src/index.js'));
+maybeEnable(await import('npm:dd-trace@4.13.1/packages/datadog-plugin-fetch/src/index.js'));
 
 function maybeEnable(Plugin: { id: string }) {
   if (!Plugin || typeof Plugin !== 'function') return;

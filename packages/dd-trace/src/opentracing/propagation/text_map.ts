@@ -1,11 +1,11 @@
-// @deno-types="npm:@types/lodash/pick.d.ts"
-import pick from 'npm:lodash/pick.js';
+// @deno-types="npm:@types/lodash@4.14.197/pick.d.ts"
+import pick from 'npm:lodash@4.17.21/pick.js';
 import id from '../../id.ts';
 import DatadogSpanContext from '../span_context.ts';
 import log from '../../log/index.ts';
 import TraceState from './tracestate.ts';
 
-import * as priority from 'npm:dd-trace/ext/priority.js';
+import * as priority from 'npm:dd-trace@4.13.1/ext/priority.js';
 const { AUTO_KEEP, AUTO_REJECT, USER_KEEP } = priority;
 
 const traceKey = 'x-datadog-trace-id';

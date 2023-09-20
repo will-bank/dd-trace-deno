@@ -1,4 +1,4 @@
-import { LOG } from 'npm:dd-trace/ext/formats.js';
+import { LOG } from 'npm:dd-trace@4.13.1/ext/formats.js';
 import Plugin from './plugin.ts';
 import { storage } from '../../../datadog-core/index.ts';
 

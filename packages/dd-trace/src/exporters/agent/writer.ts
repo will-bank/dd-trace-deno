@@ -2,7 +2,7 @@ import request from '../common/request.ts';
 import { startupLog } from '../../startup-log.ts';
 import * as runtimeMetrics from '../../runtime_metrics.ts';
 import log from '../../log/index.ts';
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' };
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
 import BaseWriter from '../common/writer.ts';
 import { AgentEncoder as AgentEncoderV04 } from '../../encode/0.4.ts';
 import { AgentEncoder as AgentEncoderV05 } from '../../encode/0.5.ts';

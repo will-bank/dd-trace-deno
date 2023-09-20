@@ -1,5 +1,5 @@
 import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
-import retry from 'npm:retry';
+import retry from 'npm:retry@0.13.1';
 import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 
@@ -7,7 +7,7 @@ import { request as httpsRequest } from "node:https";
 import docker from '../../exporters/common/docker.ts';
 import FormData from '../../exporters/common/form-data.ts';
 import { storage } from '../../../../datadog-core/index.ts';
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' };
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
 const containerId = docker.id();
 
 function sendRequest(

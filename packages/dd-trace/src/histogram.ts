@@ -1,4 +1,4 @@
-import { DDSketch } from 'npm:@datadog/sketches-js';
+import { DDSketch } from 'npm:@datadog/sketches-js@2.1.0';
 
 class Histogram {
   private _min: any;

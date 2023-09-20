@@ -1,5 +1,5 @@
 import { globMatch } from '../src/util.ts';
-import * as priority from 'npm:dd-trace/ext/priority.js';
+import * as priority from 'npm:dd-trace@4.13.1/ext/priority.js';
 const { USER_KEEP, AUTO_KEEP } = priority;
 import RateLimiter from './rate_limiter.ts';
 import Sampler from './sampler.ts';

@@ -1,8 +1,8 @@
 import { storage } from '../../../../datadog-core/index.ts';
 
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
-import * as tags from 'npm:dd-trace/ext/tags.js';
-import * as types from 'npm:dd-trace/ext/types.js';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
+import * as types from 'npm:dd-trace@4.13.1/ext/types.js';
 const { WEB } = types;
 import runtimeMetrics from '../../runtime_metrics.ts';
 import telemetryMetrics from '../../telemetry/metrics.ts';

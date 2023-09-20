@@ -9,8 +9,8 @@ const {
   AsyncResource,
 
 } = await import('./helpers/instrument.ts');
-// @deno-types="npm:@types/lodash/kebabcase.d.ts"
-import kebabCase from 'npm:lodash/kebabcase.js';
+// @deno-types="npm:@types/lodash@4.14.197/kebabcase.d.ts"
+import kebabCase from 'npm:lodash@4.17.21/kebabcase.js';
 import shimmer from '../../datadog-shimmer/index.ts';
 
 const startCh = dc.channel('apm:amqplib:command:start');

@@ -3,7 +3,7 @@ import { disableAllAnalyzers, enableAllAnalyzers } from './analyzers.ts';
 import web from '../../plugins/util/web.ts';
 import { storage } from '../../../../datadog-core/index.ts';
 import * as overheadController from './overhead-controller.ts';
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 import * as iastContextFunctions from './iast-context.ts';
 import {
   createTransaction,

@@ -1,6 +1,6 @@
 import log from '../../log/index.ts';
 import { getRootSpan } from './utils.ts';
-import * as tags from 'npm:dd-trace/ext/tags.js';
+import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
 const { MANUAL_KEEP } = tags;
 import { setUserTags } from './set_user.ts';
 

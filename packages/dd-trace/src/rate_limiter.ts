@@ -1,4 +1,4 @@
-import limiter from 'npm:limiter';
+import limiter from 'npm:limiter@1.1.5';
 
 class RateLimiter {
   private _rateLimit: number;

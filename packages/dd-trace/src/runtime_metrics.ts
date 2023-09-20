@@ -26,7 +26,7 @@ reset();
 export function start(config) {
   const clientConfig = DogStatsDClient.generateClientConfig(config);
 
-  import('npm:@datadog/native-metrics').then((ddNativeMetrics) => {
+  import('npm:@datadog/native-metrics@2.0.0').then((ddNativeMetrics) => {
     nativeMetrics = ddNativeMetrics;
     nativeMetrics.start();
   }).catch((e) => {

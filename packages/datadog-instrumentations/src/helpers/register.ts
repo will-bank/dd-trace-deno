@@ -1,8 +1,8 @@
 'use strict';
 
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 import path from 'node:path';
-import semver from 'npm:semver';
+import semver from 'npm:semver@7.5.4';
 import Hook from './hook.ts';
 import requirePackageJson from '../../../dd-trace/src/require-package-json.ts';
 import log from '../../../dd-trace/src/log/index.ts';

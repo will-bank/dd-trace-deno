@@ -1,5 +1,5 @@
-import api from 'npm:@opentelemetry/api';
-import { sanitizeAttributes } from 'npm:@opentelemetry/core';
+import api from 'npm:@opentelemetry/api@1.4.1';
+import { sanitizeAttributes } from 'npm:@opentelemetry/core@1.15.2';
 
 import Sampler from './sampler.ts';
 import Span from './span.ts';

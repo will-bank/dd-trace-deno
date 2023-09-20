@@ -1,4 +1,4 @@
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' };
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
 import { sendData } from './send-data.ts';
 
 function getId(type: string, namespace: MetricsCollection, name, tags) {

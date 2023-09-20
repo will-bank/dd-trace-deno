@@ -15,7 +15,7 @@ import * as Reporter from './reporter.ts';
 import * as appsecTelemetry from './telemetry.ts';
 import web from '../plugins/util/web.ts';
 import { extractIp } from '../plugins/util/ip_extractor.ts';
-import * as tags from 'npm:dd-trace/ext/tags.js';
+import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
 const { HTTP_CLIENT_IP } = tags;
 import { block, setTemplates } from './blocking.ts';
 import { passportTrackEvent } from './passport.ts';

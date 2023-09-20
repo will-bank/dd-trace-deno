@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import { URL } from 'node:url';
 import log from './log/index.ts';
 import pkg from './pkg.ts';
-import coalesce from 'npm:koalas';
+import coalesce from 'npm:koalas@1.0.2';
 import * as tagger from './tagger.ts';
 import { isFalse, isTrue } from './util.ts';
 import { GIT_COMMIT_SHA, GIT_REPOSITORY_URL } from './plugins/util/tags.ts';

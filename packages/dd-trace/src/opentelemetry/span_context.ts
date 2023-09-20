@@ -1,5 +1,5 @@
-import api from 'npm:@opentelemetry/api';
-import * as priority from 'npm:dd-trace/ext/priority.js';
+import api from 'npm:@opentelemetry/api@1.4.1';
+import * as priority from 'npm:dd-trace@4.13.1/ext/priority.js';
 import DatadogSpanContext from '../opentracing/span_context.ts';
 import id from '../id.ts';
 

@@ -1,8 +1,8 @@
 import path from 'node:path';
-import parse from 'npm:module-details-from-path';
+import parse from 'npm:module-details-from-path@1.0.3';
 import requirePackageJson from '../require-package-json.ts';
 import { sendData } from './send-data.ts';
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 import { fileURLToPath } from 'node:url';
 import Config from "../config.ts";
 

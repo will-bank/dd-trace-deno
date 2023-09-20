@@ -1,4 +1,4 @@
-import ipaddr from 'npm:ipaddr.js';
+import ipaddr from 'npm:ipaddr.js@2.1.0';
 
 export default class BlockList {
   v4Ranges: any[];

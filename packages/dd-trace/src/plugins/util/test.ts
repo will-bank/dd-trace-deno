@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import { URL } from 'node:url';
 import log from '../../log/index.ts';
 
-import istanbul from 'npm:istanbul-lib-coverage';
-import ignore from 'npm:ignore';
+import istanbul from 'npm:istanbul-lib-coverage@3.2.0';
+import ignore from 'npm:ignore@5.2.4';
 
 import { getGitMetadata } from './git.ts';
 import { getUserProviderGitMetadata, validateGitCommitSha, validateGitRepositoryUrl } from './user-provided-git.ts';
@@ -23,12 +23,12 @@ import {
 } from './tags.ts';
 import id from '../../id.ts';
 
-import * as tags from 'npm:dd-trace/ext/tags.js';
+import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
 const { RESOURCE_NAME, SAMPLING_PRIORITY, SPAN_TYPE } = tags;
 import { SAMPLING_RULE_DECISION } from '../../constants.ts';
-import * as priority from 'npm:dd-trace/ext/priority.js';
+import * as priority from 'npm:dd-trace@4.13.1/ext/priority.js';
 const { AUTO_KEEP } = priority;
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' };
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
 const TEST_FRAMEWORK = 'test.framework';
 const TEST_FRAMEWORK_VERSION = 'test.framework_version';
 const TEST_TYPE = 'test.type';

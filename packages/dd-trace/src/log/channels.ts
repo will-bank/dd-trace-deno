@@ -1,4 +1,4 @@
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 
 const Level = {
   Debug: 'debug',

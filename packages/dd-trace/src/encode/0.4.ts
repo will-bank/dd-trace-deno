@@ -2,7 +2,7 @@ import { normalizeSpan, truncateSpan } from './tags-processors.ts';
 import Chunk from './chunk.ts';
 import log from '../log/index.ts';
 import { isTrue } from '../util.ts';
-import coalesce from 'npm:koalas';
+import coalesce from 'npm:koalas@1.0.2';
 import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
 
 const SOFT_LIMIT = 8 * 1024 * 1024; // 8MB

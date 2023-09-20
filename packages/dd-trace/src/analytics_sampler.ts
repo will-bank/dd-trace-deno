@@ -1,4 +1,4 @@
-import * as tags from 'npm:dd-trace/ext/tags.js';
+import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
 
 export function sample(
   span: {

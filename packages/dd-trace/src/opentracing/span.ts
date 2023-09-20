@@ -2,7 +2,7 @@
 import { performance } from 'node:perf_hooks';
 const now = performance.now.bind(performance);
 const dateNow = Date.now;
-import semver from 'npm:semver';
+import semver from 'npm:semver@7.5.4';
 import SpanContext from './span_context.ts';
 import id from '../id.ts';
 import * as tagger from '../tagger.ts';

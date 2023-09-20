@@ -1,1 +1,1 @@
-export * from 'import-in-the-middle/hook.mjs'
+export * from 'import-in-the-middle@1.4.2/hook.mjs'

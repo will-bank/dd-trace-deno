@@ -1,5 +1,5 @@
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' };
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 import os from 'node:os';
 import * as dependencies from './dependencies.ts';
 import { sendData } from './send-data.ts';

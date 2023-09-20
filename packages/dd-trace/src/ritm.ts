@@ -1,7 +1,7 @@
 import path from 'node:path';
 import Module from 'node:module';
-import parse from 'npm:module-details-from-path';
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import parse from 'npm:module-details-from-path@1.0.3';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 
 const origRequire = Module.prototype.require;
 

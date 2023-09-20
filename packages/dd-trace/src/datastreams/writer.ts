@@ -1,8 +1,8 @@
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' };
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
 import log from '../log/index.ts';
 import request from '../exporters/common/request.ts';
 import { format, URL } from 'node:url';
-import msgpack from 'npm:msgpack-lite';
+import msgpack from 'npm:msgpack-lite@0.1.26';
 import zlib from 'node:zlib';
 const codec = msgpack.createCodec({ int64: true });
 

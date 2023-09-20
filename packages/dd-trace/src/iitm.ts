@@ -1,5 +1,5 @@
-import * as importInTheMiddle from 'npm:import-in-the-middle';
-import dc from 'npm:dd-trace/packages/diagnostics_channel/index.js';
+import * as importInTheMiddle from 'npm:import-in-the-middle@1.4.2';
+import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
 
 const moduleLoadStartChannel = dc.channel('dd-trace:moduleLoadStart');
 
@@ -27,7 +27,7 @@ export default importInTheMiddle.default;
 //       });
 //     }
 //   });
-//   export default await import('import-in-the-middle');
+//   export default await import('import-in-the-middle@1.4.2');
 // } else {
 //   logger.warn(
 //     'ESM is not fully supported by this version of Node.js, ' +

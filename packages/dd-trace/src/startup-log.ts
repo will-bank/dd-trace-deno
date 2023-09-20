@@ -2,7 +2,7 @@ import { info, warn } from './log/writer.ts';
 
 import os from 'node:os';
 import { inspect } from 'node:util';
-import packageJson from 'npm:dd-trace/package.json' assert { type: 'json' };
+import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
 let config;
 let pluginManager;
 let samplingRules = [];

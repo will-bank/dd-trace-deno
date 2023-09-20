@@ -1,4 +1,4 @@
-import { context, trace } from 'npm:@opentelemetry/api';
+import { context, trace } from 'npm:@opentelemetry/api@1.4.1';
 
 import tracer from '../index.ts';
 
