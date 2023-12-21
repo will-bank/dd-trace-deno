@@ -1,8 +1,8 @@
-import path from 'node:path';
-
+import { join } from 'https://deno.land/std@0.204.0/path/join.ts';
+import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
 import { getNodeModulesPaths } from '../path-line.ts';
-import Analyzer from './vulnerability-analyzer.ts';
 import { WEAK_HASH } from '../vulnerabilities.ts';
+import Analyzer from './vulnerability-analyzer.ts';
 
 const INSECURE_HASH_ALGORITHMS = new Set([
   'md4',
@@ -33,7 +33,7 @@ const EXCLUDED_LOCATIONS = getNodeModulesPaths(
 );
 
 const EXCLUDED_PATHS_FROM_STACK = [
-  path.join('node_modules', 'object-hash', path.sep),
+  join('node_modules', 'object-hash', SEP),
 ];
 class WeakHashAnalyzer extends Analyzer {
   constructor() {

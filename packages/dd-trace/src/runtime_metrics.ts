@@ -1,82 +1,39 @@
 // TODO: capture every second and flush every 10 seconds
 
 import v8 from 'node:v8';
-import os from 'node:os';
-import process from 'node:process';
 import { DogStatsDClient } from './dogstatsd.ts';
-import log from './log/index.ts';
 import Histogram from './histogram.ts';
-import { performance } from 'node:perf_hooks';
+import log from './log/index.ts';
 
 const INTERVAL = 10 * 1000;
-
-let nativeMetrics = null;
+const START_TIME = Date.now();
 
 let interval;
 let client;
-let time;
-let cpuUsage;
 let gauges;
 let counters;
 let histograms;
-let elu;
 
 reset();
 
 export function start(config) {
   const clientConfig = DogStatsDClient.generateClientConfig(config);
 
-  import('npm:@datadog/native-metrics@2.0.0').then((ddNativeMetrics) => {
-    nativeMetrics = ddNativeMetrics;
-    nativeMetrics.start();
-  }).catch((e) => {
-    log.error(e);
-    nativeMetrics = null;
-  });
-
   client = new DogStatsDClient(clientConfig);
 
-  time = process.hrtime();
+  interval = setInterval(() => {
+    captureCommonMetrics();
+    captureCpuUsage();
+    captureHeapSpace();
+    client.flush();
+  }, INTERVAL);
 
-  if (nativeMetrics) {
-    interval = setInterval(() => {
-      captureCommonMetrics();
-      captureNativeMetrics();
-      client.flush();
-    }, INTERVAL);
-  } else {
-    cpuUsage = process.cpuUsage();
-
-    interval = setInterval(() => {
-      captureCommonMetrics();
-      captureCpuUsage();
-      captureHeapSpace();
-      client.flush();
-    }, INTERVAL);
-  }
-
-  interval.unref();
+  Deno.unrefTimer(interval);
 }
 
 export function stop() {
-  if (nativeMetrics) {
-    nativeMetrics.stop();
-  }
-
   clearInterval(interval);
   reset();
-}
-
-export function track(span) {
-  if (nativeMetrics) {
-    const handle = nativeMetrics.track(span);
-
-    return {
-      finish: () => nativeMetrics.finish(handle),
-    };
-  }
-
-  return { finish: () => {} };
 }
 
 export function boolean(name, value, tag) {
@@ -95,7 +52,12 @@ export function histogram(name: string | number, value, tag) {
   histograms[name].get(tag).record(value);
 }
 
-export function updateCount(name: string | number, count: number, tagOrMonotonic?: string | boolean, monotonic = false) {
+export function updateCount(
+  name: string | number,
+  count: number,
+  tagOrMonotonic?: string | boolean,
+  monotonic = false,
+) {
   if (!client) return;
   let tag;
   if (typeof tagOrMonotonic === 'boolean') {
@@ -124,7 +86,7 @@ export function gauge(name: string | number, value, tag) {
 export function increment(
   name: Parameters<typeof updateCount>[0],
   tagOrMonotonic?: Parameters<typeof updateCount>[2],
-  monotonic?: Parameters<typeof updateCount>[3]
+  monotonic?: Parameters<typeof updateCount>[3],
 ) {
   updateCount(name, 1, tagOrMonotonic, monotonic);
 }
@@ -132,7 +94,7 @@ export function increment(
 export function decrement(
   name: Parameters<typeof updateCount>[0],
   tagOrMonotonic?: Parameters<typeof updateCount>[2],
-  monotonic?: Parameters<typeof updateCount>[3]
+  monotonic?: Parameters<typeof updateCount>[3],
 ) {
   updateCount(name, -1, tagOrMonotonic, monotonic);
 }
@@ -140,74 +102,62 @@ export function decrement(
 function reset() {
   interval = null;
   client = null;
-  time = null;
-  cpuUsage = null;
   gauges = {};
   counters = {};
   histograms = {};
-  nativeMetrics = null;
 }
 
 function captureCpuUsage() {
-  if (!process.cpuUsage) return;
-
-  const elapsedTime = process.hrtime(time);
-  const elapsedUsage = process.cpuUsage(cpuUsage);
-
-  time = process.hrtime();
-  cpuUsage = process.cpuUsage();
-
-  const elapsedMs = elapsedTime[0] * 1000 + elapsedTime[1] / 1000000;
-  const userPercent = 100 * elapsedUsage.user / 1000 / elapsedMs;
-  const systemPercent = 100 * elapsedUsage.system / 1000 / elapsedMs;
-  const totalPercent = userPercent + systemPercent;
-
-  client.gauge('runtime.node.cpu.system', systemPercent.toFixed(2));
-  client.gauge('runtime.node.cpu.user', userPercent.toFixed(2));
-  client.gauge('runtime.node.cpu.total', totalPercent.toFixed(2));
+  const [avg1min] = Deno.loadavg();
+  client.gauge('runtime.deno.cpu.total', avg1min.toFixed(2));
 }
 
 function captureMemoryUsage() {
-  const stats = process.memoryUsage();
+  const usage = Deno.memoryUsage();
+  const system = Deno.systemMemoryInfo();
 
-  client.gauge('runtime.node.mem.heap_total', stats.heapTotal);
-  client.gauge('runtime.node.mem.heap_used', stats.heapUsed);
-  client.gauge('runtime.node.mem.rss', stats.rss);
-  client.gauge('runtime.node.mem.total', os.totalmem());
-  client.gauge('runtime.node.mem.free', os.freemem());
-
-  stats.external && client.gauge('runtime.node.mem.external', stats.external);
+  client.gauge('runtime.deno.mem.heap_total', usage.heapTotal);
+  client.gauge('runtime.deno.mem.heap_used', usage.heapUsed);
+  client.gauge('runtime.deno.mem.rss', usage.rss);
+  client.gauge('runtime.deno.mem.total', system.total);
+  client.gauge('runtime.deno.mem.free', system.free);
+  client.gauge('runtime.deno.mem.external', usage.external);
 }
 
 function captureProcess() {
-  client.gauge('runtime.node.process.uptime', Math.round(process.uptime()));
+  client.gauge('runtime.deno.process.uptime', Math.round(Date.now() - START_TIME / 1000));
 }
 
 function captureHeapStats() {
   const stats = v8.getHeapStatistics();
 
-  client.gauge('runtime.node.heap.total_heap_size', stats.total_heap_size);
-  client.gauge('runtime.node.heap.total_heap_size_executable', stats.total_heap_size_executable);
-  client.gauge('runtime.node.heap.total_physical_size', stats.total_physical_size);
-  client.gauge('runtime.node.heap.total_available_size', stats.total_available_size);
-  client.gauge('runtime.node.heap.heap_size_limit', stats.heap_size_limit);
+  client.gauge('runtime.deno.heap.total_heap_size', stats.total_heap_size);
+  client.gauge('runtime.deno.heap.total_heap_size_executable', stats.total_heap_size_executable);
+  client.gauge('runtime.deno.heap.total_physical_size', stats.total_physical_size);
+  client.gauge('runtime.deno.heap.total_available_size', stats.total_available_size);
+  client.gauge('runtime.deno.heap.heap_size_limit', stats.heap_size_limit);
 
-  stats.malloced_memory && client.gauge('runtime.node.heap.malloced_memory', stats.malloced_memory);
-  stats.peak_malloced_memory && client.gauge('runtime.node.heap.peak_malloced_memory', stats.peak_malloced_memory);
+  stats.malloced_memory && client.gauge('runtime.deno.heap.malloced_memory', stats.malloced_memory);
+  stats.peak_malloced_memory && client.gauge('runtime.deno.heap.peak_malloced_memory', stats.peak_malloced_memory);
 }
 
 function captureHeapSpace() {
-  if (!v8.getHeapSpaceStatistics) return;
+  try {
+    if (!v8.getHeapSpaceStatistics) return;
 
-  const stats = v8.getHeapSpaceStatistics();
+    // (2023-12-22) not implemented yet: https://github.com/denoland/deno/blob/cdbf902/ext/node/polyfills/v8.ts#L20
+    const stats = v8.getHeapSpaceStatistics();
 
-  for (let i = 0, l = stats.length; i < l; i++) {
-    const tags = [`space:${stats[i].space_name}`];
+    for (let i = 0, l = stats.length; i < l; i++) {
+      const tags = [`space:${stats[i].space_name}`];
 
-    client.gauge('runtime.node.heap.size.by.space', stats[i].space_size, tags);
-    client.gauge('runtime.node.heap.used_size.by.space', stats[i].space_used_size, tags);
-    client.gauge('runtime.node.heap.available_size.by.space', stats[i].space_available_size, tags);
-    client.gauge('runtime.node.heap.physical_size.by.space', stats[i].physical_space_size, tags);
+      client.gauge('runtime.deno.heap.size.by.space', stats[i].space_size, tags);
+      client.gauge('runtime.deno.heap.used_size.by.space', stats[i].space_used_size, tags);
+      client.gauge('runtime.deno.heap.available_size.by.space', stats[i].space_available_size, tags);
+      client.gauge('runtime.deno.heap.physical_size.by.space', stats[i].physical_space_size, tags);
+    }
+  } catch (e) {
+    log.error(e);
   }
 }
 
@@ -238,23 +188,6 @@ function captureHistograms() {
   });
 }
 
-/**
- * Gathers and reports Event Loop Utilization (ELU) since last run
- *
- * ELU is a measure of how busy the event loop is, like running JavaScript or
- * waiting on *Sync functions. The value is between 0 (idle) and 1 (exhausted).
- *
- * performance.eventLoopUtilization available in Node.js >= v14.10, >= v12.19, >= v16
- */
-const captureELU = ('eventLoopUtilization' in performance)
-  ? () => {
-    // if elu is undefined (first run) the measurement is from start of process
-    elu = performance.eventLoopUtilization(elu);
-
-    client.gauge('runtime.node.event_loop.utilization', elu.utilization);
-  }
-  : () => {};
-
 function captureCommonMetrics() {
   captureMemoryUsage();
   captureProcess();
@@ -262,43 +195,6 @@ function captureCommonMetrics() {
   captureGauges();
   captureCounters();
   captureHistograms();
-  captureELU();
-}
-
-function captureNativeMetrics() {
-  const stats = nativeMetrics.stats();
-  const spaces = stats.heap.spaces;
-  const elapsedTime = process.hrtime(time);
-
-  time = process.hrtime();
-
-  const elapsedUs = elapsedTime[0] * 1e6 + elapsedTime[1] / 1e3;
-  const userPercent = 100 * stats.cpu.user / elapsedUs;
-  const systemPercent = 100 * stats.cpu.system / elapsedUs;
-  const totalPercent = userPercent + systemPercent;
-
-  client.gauge('runtime.node.cpu.system', systemPercent.toFixed(2));
-  client.gauge('runtime.node.cpu.user', userPercent.toFixed(2));
-  client.gauge('runtime.node.cpu.total', totalPercent.toFixed(2));
-
-  _histogram('runtime.node.event_loop.delay', stats.eventLoop);
-
-  Object.keys(stats.gc).forEach((type) => {
-    if (type === 'all') {
-      _histogram('runtime.node.gc.pause', stats.gc[type]);
-    } else {
-      _histogram('runtime.node.gc.pause.by.type', stats.gc[type], [`gc_type:${type}`]);
-    }
-  });
-
-  for (let i = 0, l = spaces.length; i < l; i++) {
-    const tags = [`heap_space:${spaces[i].space_name}`];
-
-    client.gauge('runtime.node.heap.size.by.space', spaces[i].space_size, tags);
-    client.gauge('runtime.node.heap.used_size.by.space', spaces[i].space_used_size, tags);
-    client.gauge('runtime.node.heap.available_size.by.space', spaces[i].space_available_size, tags);
-    client.gauge('runtime.node.heap.physical_size.by.space', spaces[i].physical_space_size, tags);
-  }
 }
 
 function _histogram(

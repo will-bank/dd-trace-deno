@@ -1,4 +1,4 @@
-import { DDSketch } from 'npm:@datadog/sketches-js@2.1.0';
+import { DDSketch } from 'https://esm.sh/@datadog/sketches-js@2.1.0';
 
 class Histogram {
   private _min: any;
@@ -9,7 +9,6 @@ class Histogram {
   constructor() {
     this.reset();
   }
-
 
   get min() {
     return this._min;

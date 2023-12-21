@@ -13,7 +13,6 @@ import {
 } from './tags.ts';
 
 import { normalizeRef } from './ci.ts';
-import { URL } from 'node:url';
 
 function removeEmptyValues(tags: object) {
   return Object.keys(tags).reduce((filteredTags, tag) => {

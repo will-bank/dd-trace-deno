@@ -11,10 +11,10 @@ import AppsecSdk from './appsec/sdk/index.ts';
 import * as dogstatsd from './dogstatsd.ts';
 import TracerProvider from './opentelemetry/tracer_provider.ts';
 
-export default class Tracer extends NoopProxy {
+export default class ProxyTracer extends NoopProxy {
   private _initialized: boolean;
-  private _pluginManager: any;
-  dogstatsd: any;
+  private _pluginManager: PluginManager;
+  dogstatsd: dogstatsd.NoopDogStatsDClient;
   private _tracer: DatadogTracer;
   appsec: any;
   private _testApiManualPlugin: any;
@@ -26,7 +26,7 @@ export default class Tracer extends NoopProxy {
     this.dogstatsd = new dogstatsd.NoopDogStatsDClient();
   }
 
-  async init(options) {
+  async init(options): Promise<this> {
     if (this._initialized) return this;
 
     this._initialized = true;
@@ -71,7 +71,7 @@ export default class Tracer extends NoopProxy {
         // do not stop tracer initialization if the profiler fails to be imported
         try {
           const profiler = await import('./profiler.ts');
-          profiler.start(config)
+          profiler.start(config);
         } catch (e) {
           log.error(e);
         }
@@ -88,7 +88,7 @@ export default class Tracer extends NoopProxy {
         // dirty require for now so zero appsec code is executed unless explicitly enabled
         if (config.appsec.enabled) {
           const appsec = await import('./appsec/index.ts');
-          appsec.enable(config)
+          appsec.enable(config);
         }
 
         this._tracer = new DatadogTracer(config);
@@ -96,14 +96,16 @@ export default class Tracer extends NoopProxy {
 
         if (config.iast.enabled) {
           const iast = await import('./appsec/iast/index.ts');
-          iast.enable(config, this._tracer)
+          iast.enable(config, this._tracer);
         }
 
         this._pluginManager.configure(config);
         setStartupLogPluginManager(this._pluginManager);
 
         if (config.isManualApiEnabled) {
-          const { default: TestApiManualPlugin } = await import('./ci-visibility/test-api-manual/test-api-manual-plugin.ts');
+          const { default: TestApiManualPlugin } = await import(
+            './ci-visibility/test-api-manual/test-api-manual-plugin.ts'
+          );
           this._testApiManualPlugin = new TestApiManualPlugin(this);
           this._testApiManualPlugin.configure({ ...config, enabled: true });
         }
@@ -115,8 +117,8 @@ export default class Tracer extends NoopProxy {
     return this;
   }
 
-  use() {
-    this._pluginManager.configurePlugin(...arguments);
+  use(...args: Parameters<PluginManager['configurePlugin']>) {
+    this._pluginManager.configurePlugin(...args);
     return this;
   }
 

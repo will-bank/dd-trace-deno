@@ -1,4 +1,3 @@
-import { URL } from 'node:url';
 import Writer from './writer.ts';
 import CoverageWriter from './coverage-writer.ts';
 import CiVisibilityExporter from '../ci-visibility-exporter.ts';

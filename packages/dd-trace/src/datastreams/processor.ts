@@ -1,11 +1,10 @@
-import os from 'node:os';
-import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' }; // Message pack int encoding is done in big endian, but data streams uses little endian
-import { type Uint64BE as Uint64 } from 'npm:int64-buffer@0.1.10';
+import packageJson from '../../../../package.json.ts';
+import int64Buffer from 'https://esm.sh/int64-buffer@0.1.10';
 
-import { LogCollapsingLowestDenseDDSketch } from 'npm:@datadog/sketches-js@2.1.0';
+import { LogCollapsingLowestDenseDDSketch } from 'https://esm.sh/@datadog/sketches-js@2.1.0';
 
-import { DataStreamsWriter } from './writer.ts';
 import { computePathwayHash } from './pathway.ts';
+import { DataStreamsWriter } from './writer.ts';
 const ENTRY_PARENT_HASH = new TextEncoder().encode('\0\0\0\0\0\0\0\0');
 
 const HIGH_ACCURACY_DISTRIBUTION = 0.0075;
@@ -17,8 +16,8 @@ class StatsPoint {
   edgeLatency: any;
   pathwayLatency: any;
   constructor(hash, parentHash, edgeTags) {
-    this.hash = new Uint64(hash);
-    this.parentHash = new Uint64(parentHash);
+    this.hash = new int64Buffer.Uint64BE(hash);
+    this.parentHash = new int64Buffer.Uint64BE(parentHash);
     this.edgeTags = edgeTags;
     this.edgeLatency = new LogCollapsingLowestDenseDDSketch(HIGH_ACCURACY_DISTRIBUTION);
     this.pathwayLatency = new LogCollapsingLowestDenseDDSketch(HIGH_ACCURACY_DISTRIBUTION);
@@ -89,7 +88,7 @@ class DataStreamsProcessor {
     });
     this.bucketSizeNs = 1e10;
     this.buckets = new TimeBuckets();
-    this.hostname = os.hostname();
+    this.hostname = Deno.hostname();
     this.enabled = dsmEnabled;
     this.env = env;
     this.tags = tags || {};
@@ -98,7 +97,7 @@ class DataStreamsProcessor {
 
     if (this.enabled) {
       this.timer = setInterval(this.onInterval.bind(this), 10000);
-      this.timer.unref();
+      Deno.unrefTimer(this.timer);
     }
   }
 
@@ -196,8 +195,8 @@ class DataStreamsProcessor {
       }
 
       serializedBuckets.push({
-        Start: new Uint64(timeNs),
-        Duration: new Uint64(this.bucketSizeNs),
+        Start: new int64Buffer.Uint64BE(timeNs),
+        Duration: new int64Buffer.Uint64BE(this.bucketSizeNs),
         Stats: points,
       });
     }

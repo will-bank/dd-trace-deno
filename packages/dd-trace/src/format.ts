@@ -1,5 +1,5 @@
 import * as constants from './constants.ts';
-import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
 import id from './id.ts';
 import { isError } from './util.ts';
 

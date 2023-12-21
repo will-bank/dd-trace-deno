@@ -27,7 +27,7 @@ class SpanProcessor {
       tags?: any;
       spanComputePeerService?: any;
       peerServiceMapping?: any;
-      logInjection?: any;
+      logInjection?: boolean;
       debug?: any;
       sampler?: any;
       traceId128BitGenerationEnabled?: any;

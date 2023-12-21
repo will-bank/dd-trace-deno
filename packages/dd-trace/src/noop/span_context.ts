@@ -1,5 +1,5 @@
 import DatadogSpanContext from '../opentracing/span_context.ts';
-import * as priority from 'npm:dd-trace@4.13.1/ext/priority.js';
+import * as priority from 'https://esm.sh/dd-trace@4.13.1/ext/priority.js';
 
 class NoopSpanContext extends DatadogSpanContext {
   constructor(

@@ -104,7 +104,7 @@ function startGlobalContext() {
     _resetGlobalContext();
   }, INTERVAL_RESET_GLOBAL_CONTEXT);
 
-  resetGlobalContextInterval.unref && resetGlobalContextInterval.unref();
+  Deno.unrefTimer(resetGlobalContextInterval);
 }
 
 function finishGlobalContext() {

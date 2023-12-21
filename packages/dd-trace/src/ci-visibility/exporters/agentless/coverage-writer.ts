@@ -10,15 +10,15 @@ class Writer extends BaseWriter {
   private _encoder: CoverageCIVisibilityEncoder;
   private _evpProxyPrefix: string;
 
-  constructor({ url, evpProxyPrefix = '' }) {
+  constructor(...args: any[]) {
+    super(...args);
 
-    super(...arguments);
+    const [{ url, evpProxyPrefix = '' }] = args;
     this._url = url;
 
     this._encoder = new CoverageCIVisibilityEncoder(this);
     this._evpProxyPrefix = evpProxyPrefix;
   }
-
 
   _sendPayload(form: { getHeaders: () => any }, _, done: () => void) {
     const options = {
@@ -39,7 +39,6 @@ class Writer extends BaseWriter {
     }
 
     log.debug(() => `Request to the intake: ${safeJSONStringify(options)}`);
-
 
     request(form, options, (err, res) => {
       if (err) {

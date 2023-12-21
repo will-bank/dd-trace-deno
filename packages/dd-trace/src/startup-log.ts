@@ -1,8 +1,7 @@
 import { info, warn } from './log/writer.ts';
 
-import os from 'node:os';
 import { inspect } from 'node:util';
-import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
+import packageJson from '../../../package.json.ts';
 let config;
 let pluginManager;
 let samplingRules = [];
@@ -45,9 +44,9 @@ function startupLog({ agentError } = {}) {
   };
 
   out.date = new Date().toISOString();
-  out.os_name = os.type();
-  out.os_version = os.release();
-  out.architecture = os.arch();
+  out.os_name = Deno.build.os;
+  out.os_version = Deno.osRelease();
+  out.architecture = Deno.build.arch;
   out.version = packageJson.version;
   out.lang = 'deno';
   out.lang_version = Deno.version.deno;

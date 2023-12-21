@@ -1,4 +1,4 @@
-import { format, URL } from 'node:url';
+import { format } from 'node:url';
 import log from '../../log/index.ts';
 import Writer from './writer.ts';
 

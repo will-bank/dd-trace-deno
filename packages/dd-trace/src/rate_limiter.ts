@@ -1,4 +1,4 @@
-import limiter from 'npm:limiter@1.1.5';
+import limiter from 'https://esm.sh/limiter@1.1.5';
 
 class RateLimiter {
   private _rateLimit: number;

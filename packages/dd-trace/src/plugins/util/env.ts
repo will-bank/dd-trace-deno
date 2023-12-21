@@ -1,5 +1,3 @@
-import os from 'node:os';
-
 const OS_PLATFORM = 'os.platform';
 const OS_VERSION = 'os.version';
 const OS_ARCHITECTURE = 'os.architecture';
@@ -8,11 +6,11 @@ const RUNTIME_VERSION = 'runtime.version';
 
 function getRuntimeAndOSMetadata() {
   return {
-    [RUNTIME_VERSION]: process.version,
-    [OS_ARCHITECTURE]: process.arch,
-    [OS_PLATFORM]: process.platform,
-    [RUNTIME_NAME]: 'node',
-    [OS_VERSION]: os.release(),
+    [RUNTIME_VERSION]: Deno.version.deno,
+    [OS_ARCHITECTURE]: Deno.build.arch,
+    [OS_PLATFORM]: Deno.build.os,
+    [RUNTIME_NAME]: 'deno',
+    [OS_VERSION]: Deno.osRelease(),
   };
 }
 

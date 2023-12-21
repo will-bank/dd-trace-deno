@@ -1,8 +1,8 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { ROOT_CONTEXT, trace } from 'npm:@opentelemetry/api@1.4.1';
+import { ROOT_CONTEXT, trace } from 'https://esm.sh/@opentelemetry/api@1.4.1';
 
 import SpanContext from './span_context.ts';
-import tracer from '../index.ts';
+import tracer from '../proxy.ts';
 
 // Horrible hack to acquire the otherwise inaccessible SPAN_KEY so we can redirect it...
 // This is used for getting the current span context in OpenTelemetry, but the SPAN_KEY value is

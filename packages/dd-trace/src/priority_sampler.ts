@@ -1,6 +1,6 @@
 import RateLimiter from './rate_limiter.ts';
 import Sampler from './sampler.ts';
-import * as ext from 'npm:dd-trace@4.13.1/ext/index.js';
+import * as ext from 'https://esm.sh/dd-trace@4.13.1/ext/index.js';
 import { setSamplingRules } from './startup-log.ts';
 
 import {

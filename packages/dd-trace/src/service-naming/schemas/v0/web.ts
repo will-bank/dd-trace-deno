@@ -1,5 +1,5 @@
 import { awsServiceV0, httpPluginClientService, identityService } from '../util.ts';
-import * as version from 'npm:dd-trace@4.13.1/version.js';
+import * as version from 'https://esm.sh/dd-trace@4.13.1/version.js';
 
 export const client = {
   grpc: {

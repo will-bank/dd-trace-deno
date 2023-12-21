@@ -1,11 +1,14 @@
 {
+  "lock": false,
+  "vendor": true,
+  "unstable": ["bare-node-builtins"], // Backwards compatibility for Node.js modules that reference bare builtins (without `node:` prefix)
   "lint": {
     "include": ["**/*.ts"],
-    "exclude": ["**/fixtures/", "**/node_modules/"],
+    "exclude": ["vendor/", ".deno/", "**/fixtures/", "**/node_modules/"],
     "rules": {
       "tags": ["recommended"],
       "include": ["ban-untagged-todo"],
-      "exclude": ["require-await", "no-unused-vars"]
+      "exclude": ["no-unused-vars"]
     }
   },
   "fmt": {
@@ -16,13 +19,10 @@
     "singleQuote": true,
     "proseWrap": "preserve",
     "include": ["**/*.ts"],
-    "exclude": ["**/fixtures/", "**/node_modules/"]
+    "exclude": ["vendor/", ".deno/", "**/fixtures/", "**/node_modules/"]
   },
   "test": {
-    "include": ["**/spec/"]
-  },
-  "imports": {
-    // "dd-trace/": "https://raw.githubusercontent.com/DataDog/dd-trace-js/v4.15.0/"
+    "include": ["vendor/", ".deno/", "**/spec/"]
   },
   "compilerOptions": {
     "strict": false,
@@ -30,6 +30,6 @@
     "noExplicitAny": false
   },
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "deno run --watch -A --unstable mod.ts"
   }
 }

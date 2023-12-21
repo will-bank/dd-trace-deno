@@ -1,4 +1,4 @@
-import path from 'node:path';
+import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
 
 export function isTrue(str: string) {
   str = String(str).toLowerCase();
@@ -62,7 +62,7 @@ export function globMatch(pattern: string | any[], subject: string | any[]) {
 }
 
 export function calculateDDBasePath(dirname: string) {
-  const dirSteps = dirname.split(path.sep);
+  const dirSteps = dirname.split(SEP);
   const packagesIndex = dirSteps.lastIndexOf('packages');
-  return dirSteps.slice(0, packagesIndex + 1).join(path.sep) + path.sep;
+  return dirSteps.slice(0, packagesIndex + 1).join(SEP) + SEP;
 }

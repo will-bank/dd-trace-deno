@@ -1,9 +1,9 @@
 import * as vulnerabilityReporter from './vulnerability-reporter.ts';
-import { disableAllAnalyzers, enableAllAnalyzers } from './analyzers.ts';
+import { disableAllAnalyzers, enableAllAnalyzers } from './analyzers/index.ts';
 import web from '../../plugins/util/web.ts';
 import { storage } from '../../../../datadog-core/index.ts';
 import * as overheadController from './overhead-controller.ts';
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import dc from 'node:diagnostics_channel';
 import * as iastContextFunctions from './iast-context.ts';
 import {
   createTransaction,

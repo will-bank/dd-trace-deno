@@ -1,10 +1,6 @@
-import fs from 'node:fs';
-import os from 'node:os';
-import crypto from 'node:crypto';
-import { URL } from 'node:url';
+import { existsSync } from 'https://deno.land/std@0.204.0/fs/exists.ts';
 import log from './log/index.ts';
-import pkg from './pkg.ts';
-import coalesce from 'npm:koalas@1.0.2';
+import coalesce from 'https://esm.sh/koalas@1.0.2';
 import * as tagger from './tagger.ts';
 import { isFalse, isTrue } from './util.ts';
 import { GIT_COMMIT_SHA, GIT_REPOSITORY_URL } from './plugins/util/tags.ts';
@@ -23,7 +19,7 @@ const qsRegex =
 function maybeFile(filepath) {
   if (!filepath) return;
   try {
-    return fs.readFileSync(filepath, 'utf8');
+    return Deno.readTextFileSync(filepath);
   } catch (e) {
     log.error(e);
     return undefined;
@@ -313,8 +309,7 @@ export default class Config {
       Deno.env.get('FUNCTION_NAME') || // Google Cloud Function Name set by deprecated runtimes
       Deno.env.get('K_SERVICE') || // Google Cloud Function Name set by newer runtimes
       Deno.env.get('WEBSITE_SITE_NAME') || // set by Azure Functions
-      pkg.name ||
-      'node';
+      Deno.mainModule;
     const DD_SERVICE_MAPPING = coalesce(
       options.serviceMapping,
       Deno.env.get('DD_SERVICE_MAPPING')
@@ -332,7 +327,6 @@ export default class Config {
       options.version,
       Deno.env.get('DD_VERSION'),
       this.tags.version,
-      pkg.version,
     );
     const DD_TRACE_STARTUP_LOGS = coalesce(
       options.startupLogs,
@@ -722,9 +716,7 @@ ken|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)
     this.tagsHeaderMaxLength = parseInt(DD_TRACE_X_DATADOG_TAGS_MAX_LENGTH);
     this.appsec = {
       enabled: DD_APPSEC_ENABLED,
-      rules: DD_APPSEC_RULES
-        ? safeJsonParse(maybeFile(DD_APPSEC_RULES))
-        : recommendedJson,
+      rules: DD_APPSEC_RULES ? safeJsonParse(maybeFile(DD_APPSEC_RULES)) : recommendedJson,
       customRulesProvided: !!DD_APPSEC_RULES,
       rateLimit: DD_APPSEC_TRACE_RATE_LIMIT,
       wafTimeout: DD_APPSEC_WAF_TIMEOUT,
@@ -778,7 +770,7 @@ ken|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)
         );
         let gitPropertiesString;
         try {
-          gitPropertiesString = fs.readFileSync(DD_GIT_PROPERTIES_FILE, 'utf8');
+          gitPropertiesString = Deno.readTextFileSync(DD_GIT_PROPERTIES_FILE);
         } catch (e) {
           // Only log error if the user has set a git.properties path
           if (Deno.env.get('DD_GIT_PROPERTIES_FILE')) {
@@ -825,7 +817,7 @@ ken|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)
       log_injection_enabled?: any;
       sampleRate?: any;
       ingestion?: { sampleRate: any };
-      logInjection?: any;
+      logInjection?: boolean;
       headerTags?: any;
     },
     remote,
@@ -959,7 +951,7 @@ ken|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)
 function getAgentUrl(url: string | URL, options: { hostname: any; port: any }) {
   if (url) return new URL(url);
 
-  if (os.type() === 'Windows_NT') return;
+  if (Deno.build.os === 'windows') return;
 
   if (
     !options.hostname &&
@@ -967,7 +959,7 @@ function getAgentUrl(url: string | URL, options: { hostname: any; port: any }) {
     !Deno.env.get('DD_AGENT_HOST') &&
     !Deno.env.get('DD_TRACE_AGENT_HOSTNAME') &&
     !Deno.env.get('DD_TRACE_AGENT_PORT') &&
-    fs.existsSync('/var/run/datadog/apm.socket')
+    existsSync('/var/run/datadog/apm.socket')
   ) {
     return new URL('unix:///var/run/datadog/apm.socket');
   }

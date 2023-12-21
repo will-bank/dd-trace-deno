@@ -1,5 +1,5 @@
-import * as importInTheMiddle from 'npm:import-in-the-middle@1.4.2';
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import * as importInTheMiddle from 'https://esm.sh/import-in-the-middle@1.4.2';
+import dc from 'node:diagnostics_channel';
 
 const moduleLoadStartChannel = dc.channel('dd-trace:moduleLoadStart');
 

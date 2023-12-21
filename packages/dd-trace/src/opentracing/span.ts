@@ -2,7 +2,6 @@
 import { performance } from 'node:perf_hooks';
 const now = performance.now.bind(performance);
 const dateNow = Date.now;
-import semver from 'npm:semver@7.5.4';
 import SpanContext from './span_context.ts';
 import id from '../id.ts';
 import * as tagger from '../tagger.ts';
@@ -52,7 +51,7 @@ export default class DatadogSpan {
   private _debug: any;
   private _processor: any;
   private _prioritySampler: any;
-  private _store: any;
+  public _store: any;
   private _duration: any; // TODO (new internal tracer): use DC events for lifecycle metrics and test them
 
   private _name: any;
@@ -109,11 +108,11 @@ export default class DatadogSpan {
     this._startTime = fields.startTime || this._getTime();
 
     if (DD_TRACE_EXPERIMENTAL_SPAN_COUNTS && finishedRegistry) {
-      runtimeMetrics.increment('runtime.node.spans.unfinished');
-      runtimeMetrics.increment('runtime.node.spans.unfinished.by.name', `span_name:${operationName}`);
+      runtimeMetrics.increment('runtime.deno.spans.unfinished');
+      runtimeMetrics.increment('runtime.deno.spans.unfinished.by.name', `span_name:${operationName}`);
 
-      runtimeMetrics.increment('runtime.node.spans.open'); // unfinished for real
-      runtimeMetrics.increment('runtime.node.spans.open.by.name', `span_name:${operationName}`);
+      runtimeMetrics.increment('runtime.deno.spans.open'); // unfinished for real
+      runtimeMetrics.increment('runtime.deno.spans.open.by.name', `span_name:${operationName}`);
 
       unfinishedRegistry.register(this, operationName, this);
     }
@@ -190,13 +189,13 @@ export default class DatadogSpan {
     getIntegrationCounter('span_finished', this._integrationName).inc();
 
     if (DD_TRACE_EXPERIMENTAL_SPAN_COUNTS && finishedRegistry) {
-      runtimeMetrics.decrement('runtime.node.spans.unfinished');
-      runtimeMetrics.decrement('runtime.node.spans.unfinished.by.name', `span_name:${this._name}`);
-      runtimeMetrics.increment('runtime.node.spans.finished');
-      runtimeMetrics.increment('runtime.node.spans.finished.by.name', `span_name:${this._name}`);
+      runtimeMetrics.decrement('runtime.deno.spans.unfinished');
+      runtimeMetrics.decrement('runtime.deno.spans.unfinished.by.name', `span_name:${this._name}`);
+      runtimeMetrics.increment('runtime.deno.spans.finished');
+      runtimeMetrics.increment('runtime.deno.spans.finished.by.name', `span_name:${this._name}`);
 
-      runtimeMetrics.decrement('runtime.node.spans.open'); // unfinished for real
-      runtimeMetrics.decrement('runtime.node.spans.open.by.name', `span_name:${this._name}`);
+      runtimeMetrics.decrement('runtime.deno.spans.open'); // unfinished for real
+      runtimeMetrics.decrement('runtime.deno.spans.open.by.name', `span_name:${this._name}`);
 
       unfinishedRegistry.unregister(this);
       finishedRegistry.register(this, this._name);
@@ -277,7 +276,7 @@ export default class DatadogSpan {
 
 function createRegistry(type: string) {
   return new FinalizationRegistry((name) => {
-    runtimeMetrics.decrement(`runtime.node.spans.${type}`);
-    runtimeMetrics.decrement(`runtime.node.spans.${type}.by.name`, [`span_name:${name}`]);
+    runtimeMetrics.decrement(`runtime.deno.spans.${type}`);
+    runtimeMetrics.decrement(`runtime.deno.spans.${type}.by.name`, [`span_name:${name}`]);
   });
 }

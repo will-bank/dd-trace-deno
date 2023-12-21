@@ -1,8 +1,8 @@
-import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
+import packageJson from '../../../../package.json.ts';
 import log from '../log/index.ts';
 import request from '../exporters/common/request.ts';
-import { format, URL } from 'node:url';
-import msgpack from 'npm:msgpack-lite@0.1.26';
+import { format } from 'node:url';
+import msgpack from 'https://esm.sh/msgpack-lite@0.1.26';
 import zlib from 'node:zlib';
 const codec = msgpack.createCodec({ int64: true });
 
@@ -22,7 +22,6 @@ function makeRequest(
     },
   };
 
-
   options.protocol = url.protocol;
 
   options.hostname = url.hostname;
@@ -30,7 +29,6 @@ function makeRequest(
   options.port = url.port;
 
   log.debug(() => `Request to the intake: ${JSON.stringify(options)}`);
-
 
   request(data, options, (err, res) => {
     cb(err, res);
@@ -62,7 +60,6 @@ class DataStreamsWriter {
       return;
     }
     const encodedPayload = msgpack.encode(payload, { codec });
-
 
     zlib.gzip(encodedPayload, { level: 1 }, (err, compressedData) => {
       if (err) {

@@ -3,7 +3,7 @@
 
 import { Readable } from 'node:stream';
 import http from 'node:http';
-import { parse as parseURL, format as formatURL, URL } from 'node:url';
+import { parse as parseURL, format as formatURL } from 'node:url';
 import docker from './docker.ts';
 import { httpAgent, httpsAgent } from './agents.ts';
 import { storage } from '../../../../datadog-core/index.ts';
@@ -18,26 +18,14 @@ let activeRequests = 0;
 function urlToOptions(url: URL) {
 
   const agent = url.agent || http.globalAgent;
-  const options: URL = {
-    protocol: url.protocol || agent.protocol,
+  const options = new URL(url);
+  options.protocol ||= agent.protocol;
+  options.hostname = typeof url.hostname === 'string' && url.hostname.startsWith('[')
+    ? url.hostname.slice(1, -1)
+    : url.hostname ||
+      url.host ||
+      'localhost';
 
-    hostname: typeof url.hostname === 'string' && url.hostname.startsWith('[')
-      ? url.hostname.slice(1, -1)
-      : url.hostname ||
-        url.host ||
-        'localhost',
-    hash: url.hash,
-    search: url.search,
-    pathname: url.pathname,
-    path: `${url.pathname || ''}${url.search || ''}`,
-    href: url.href,
-  };
-  if (url.port !== '') {
-    options.port = Number(url.port);
-  }
-  if (url.username || url.password) {
-    options.auth = `${url.username}:${url.password}`;
-  }
   return options;
 }
 
@@ -162,7 +150,6 @@ function request(
     storage.enterWith({ noop: true });
 
     try {
-      console.log('>>>>>>> timeout', timeout);
       const response = await fetch(url, {
         method: options.method,
         headers: options.headers,

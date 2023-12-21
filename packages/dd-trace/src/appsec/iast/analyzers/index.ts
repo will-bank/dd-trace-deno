@@ -1,4 +1,4 @@
-import analyzers from './analyzers.ts';
+import * as analyzers from './analyzers.ts';
 import setCookiesHeaderInterceptor from './set-cookies-header-interceptor.ts';
 
 function enableAllAnalyzers(tracerConfig) {

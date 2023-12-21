@@ -1,12 +1,12 @@
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import dc from 'node:diagnostics_channel';
 
 import iastLog from './iast-log.ts';
 import Plugin from '../../plugins/plugin.ts';
-import iastTelemetry from './telemetry.ts';
+import iastTelemetry from './telemetry/index.ts';
 import { EXECUTED_SOURCE, getExecutedMetric, getInstrumentedMetric, TagKey } from './telemetry/iast-metric.ts';
 import { storage } from '../../../../datadog-core/index.ts';
 import { getIastContext } from './iast-context.ts';
-import instrumentations from '../../../../datadog-instrumentations/src/helpers/instrumentations.ts';
+import instrumentations from 'https://esm.sh/dd-trace@4.13.1/packages/datadog-instrumentations/src/helpers/instrumentations.js';
 
 /**
  * Used by vulnerability sources and sinks to subscribe diagnostic channel events
@@ -43,7 +43,6 @@ class IastPluginSubscription {
     this.instrumentedMetric.inc(this.tag);
   }
 
-
   increaseExecuted(iastContext) {
     this.executedMetric.inc(this.tag, iastContext);
   }
@@ -66,7 +65,6 @@ class IastPlugin extends Plugin {
   }
 
   _wrapHandler(handler: (arg0: any, arg1: any) => void) {
-
     return (message, name) => {
       try {
         handler(message, name);
@@ -86,7 +84,6 @@ class IastPlugin extends Plugin {
       }
     };
   }
-
 
   _execHandlerAndIncMetric({ handler, metric, tag, iastContext = getIastContext(storage.getStore()) }) {
     try {
@@ -109,16 +106,13 @@ class IastPlugin extends Plugin {
     },
   ) {
     if (typeof iastSub === 'string') {
-
       super.addSub(iastSub, this._wrapHandler(handler));
     } else {
       iastSub = this._getAndRegisterSubscription(iastSub);
       if (iastSub) {
-
         super.addSub(iastSub.channelName, this._wrapHandler(handler));
 
         if (iastTelemetry.isEnabled()) {
-
           super.addSub(iastSub.channelName, this._getTelemetryHandler(iastSub));
         }
       }
@@ -129,7 +123,6 @@ class IastPlugin extends Plugin {
 
   configure(config: boolean) {
     if (typeof config !== 'object') {
-
       config = { enabled: config };
     }
 
@@ -139,7 +132,6 @@ class IastPlugin extends Plugin {
     }
 
     if (iastTelemetry.isEnabled()) {
-
       if (config.enabled) {
         this.enableTelemetry();
       } else {
@@ -147,10 +139,8 @@ class IastPlugin extends Plugin {
       }
     }
 
-
     super.configure(config);
   }
-
 
   _getAndRegisterSubscription({ moduleName, channelName, tag, tagKey }) {
     if (!channelName && !moduleName) return;
@@ -211,12 +201,10 @@ class SourceIastPlugin extends IastPlugin {
       ({ req }: { req: any }): void;
     },
   ) {
-
     return super.addSub({ tagKey: TagKey.SOURCE_TYPE, ...iastPluginSub }, handler);
   }
 
   addInstrumentedSource(moduleName: string, tag: any[]) {
-
     this._getAndRegisterSubscription({
       moduleName,
       tag,
@@ -243,7 +231,6 @@ class SinkIastPlugin extends IastPlugin {
       ({ req }: { req: any }): void;
     },
   ) {
-
     return super.addSub({ tagKey: TagKey.VULNERABILITY_TYPE, ...iastPluginSub }, handler);
   }
 }

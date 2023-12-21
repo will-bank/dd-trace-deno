@@ -1,4 +1,4 @@
-import ipaddr from 'npm:ipaddr.js@2.1.0';
+import ipaddr from 'https://esm.sh/ipaddr.js@2.1.0';
 
 export default class BlockList {
   v4Ranges: any[];

@@ -80,11 +80,11 @@ class OutboundPlugin extends TracingPlugin {
     return peerData;
   }
 
-  finish() {
+  finish(...args: any[]) {
 
     this.tagPeerService(this.activeSpan);
 
-    super.finish(...arguments);
+    super.finish(...args);
   }
 
   tagPeerService(span: { context: () => { (): any; new (): any; _tags: any }; addTags: (arg0: any) => void }) {

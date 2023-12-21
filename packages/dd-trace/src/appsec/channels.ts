@@ -1,4 +1,4 @@
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import dc from 'node:diagnostics_channel';
 
 // TODO = use TBD naming convention
 export const bodyParser = dc.channel('datadog:body-parser:read:finish');

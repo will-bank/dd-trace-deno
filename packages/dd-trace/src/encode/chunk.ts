@@ -1,4 +1,4 @@
-import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
+import { Buffer } from 'node:buffer';
 
 const DEFAULT_MIN_SIZE = 2 * 1024 * 1024; // 2MB
 
@@ -12,15 +12,12 @@ class Chunk {
   length: number;
   private _minSize: number;
   constructor(minSize = DEFAULT_MIN_SIZE) {
-
     this.buffer = Buffer.allocUnsafe(minSize);
     this.length = 0;
     this._minSize = minSize;
   }
 
-
   write(value) {
-
     const length = Buffer.byteLength(value);
     const offset = this.length;
 
@@ -62,7 +59,6 @@ class Chunk {
 
   _resize(size: number) {
     const oldBuffer = this.buffer;
-
 
     this.buffer = Buffer.allocUnsafe(size);
 

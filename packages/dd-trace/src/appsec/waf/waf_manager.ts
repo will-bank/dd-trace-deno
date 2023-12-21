@@ -1,5 +1,5 @@
 import log from '../../log/index.ts';
-import Reporter from './reporter.ts';
+import * as Reporter from '../reporter.ts';
 import WAFContextWrapper from './waf_context_wrapper.ts';
 
 const contexts = new WeakMap();

@@ -7,7 +7,6 @@ const codec = msgpack.createCodec({ int64: true })
 const getPort = require('get-port')
 const express = require('express')
 const path = require('path')
-const ritm = require('../../src/ritm')
 const { storage } = require('../../../datadog-core')
 
 const handlers = new Set()
@@ -284,7 +283,7 @@ module.exports = {
 
   // Stop the mock agent, reset all expectations and wipe the require cache.
   close (opts = {}) {
-    const { ritmReset, wipe } = opts
+    const { wipe } = opts
 
     listener.close()
     listener = null
@@ -294,9 +293,6 @@ module.exports = {
     handlers.clear()
     for (const plugin of plugins) {
       tracer.use(plugin, { enabled: false })
-    }
-    if (ritmReset !== false) {
-      ritm.reset()
     }
     if (wipe) {
       this.wipe()

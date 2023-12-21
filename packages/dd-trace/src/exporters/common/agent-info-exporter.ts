@@ -1,4 +1,4 @@
-import { format, URL } from 'node:url';
+import { format } from 'node:url';
 
 import request from './request.ts';
 
@@ -72,7 +72,9 @@ class AgentInfoExporter {
 
         this[timerKey] = clearTimeout(this[timerKey]);
 
-      }, flushInterval).unref();
+      }, flushInterval);
+
+      Deno.unrefTimer(this[timerKey]);
     }
   }
 

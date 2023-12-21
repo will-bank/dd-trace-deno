@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-
 // The second part is the PCF / Garden regexp. We currently assume no suffix($) to avoid matching pod UIDs
 // See https://github.com/DataDog/datadog-agent/blob/7.40.x/pkg/util/cgroups/reader.go#L50
 const uuidSource =
@@ -19,7 +17,7 @@ function getEntityId() {
 
 function readControlGroup() {
   try {
-    return fs.readFileSync('/proc/self/cgroup').toString();
+    return Deno.readTextFileSync('/proc/self/cgroup');
   } catch (err) {
     // ignore
   }

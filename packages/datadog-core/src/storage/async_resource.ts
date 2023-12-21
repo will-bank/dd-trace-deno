@@ -1,8 +1,8 @@
 'use strict';
 
 import v8 from 'node:v8';
-import { createHook } from 'node:async_hooks';
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import { AsyncLocalStorage, createHook } from 'node:async_hooks';
+import dc from 'node:diagnostics_channel';
 
 const beforeCh = dc.channel('dd-trace:storage:before');
 const afterCh = dc.channel('dd-trace:storage:after');
@@ -25,7 +25,8 @@ try {
   } catch (e) {}
 }
 
-export default class AsyncResourceStorage {
+export default abstract class AsyncResourceStorage {
+  #storage = new AsyncLocalStorage();
   private _ddResourceStore: any;
   private _enabled: boolean;
   private _hook: any;
@@ -103,12 +104,6 @@ export default class AsyncResourceStorage {
     }
   }
 
-  _executionAsyncResource() {
-    // FIXME: executionAsyncResource is not available in Deno
-    const executionAsyncResource = () => {
-      console.warn('FIXME: executionAsyncResource is not available in Deno');
-      return {};
-    };
-    return executionAsyncResource() || {};
-  }
+  // FIXME: executionAsyncResource is not available in Deno
+  abstract _executionAsyncResource();
 }

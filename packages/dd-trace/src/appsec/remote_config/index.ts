@@ -34,9 +34,7 @@ function enable(config: { appsec: { enabled: any } }) {
 }
 
 function enableWafUpdate(appsecConfig: { customRulesProvided: any }) {
-
   if (rc && appsecConfig && !appsecConfig.customRulesProvided) {
-
     rc.updateCapabilities(RemoteConfigCapabilities.ASM_IP_BLOCKING, true);
 
     rc.updateCapabilities(RemoteConfigCapabilities.ASM_USER_BLOCKING, true);
@@ -52,22 +50,18 @@ function enableWafUpdate(appsecConfig: { customRulesProvided: any }) {
 
     rc.updateCapabilities(RemoteConfigCapabilities.ASM_CUSTOM_BLOCKING_RESPONSE, true);
 
-
     rc.on('ASM_DATA', noop);
 
     rc.on('ASM_DD', noop);
 
     rc.on('ASM', noop);
 
-
     rc.on(RemoteConfigManager.kPreUpdate, RuleManager.updateWafFromRC);
   }
 }
 
 function disableWafUpdate() {
-
   if (rc) {
-
     rc.updateCapabilities(RemoteConfigCapabilities.ASM_IP_BLOCKING, false);
 
     rc.updateCapabilities(RemoteConfigCapabilities.ASM_USER_BLOCKING, false);
@@ -82,13 +76,11 @@ function disableWafUpdate() {
 
     rc.updateCapabilities(RemoteConfigCapabilities.ASM_CUSTOM_BLOCKING_RESPONSE, false);
 
-
     rc.off('ASM_DATA', noop);
 
     rc.off('ASM_DD', noop);
 
     rc.off('ASM', noop);
-
 
     rc.off(RemoteConfigManager.kPreUpdate, RuleManager.updateWafFromRC);
   }

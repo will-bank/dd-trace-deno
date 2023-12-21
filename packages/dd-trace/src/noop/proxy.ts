@@ -18,7 +18,7 @@ export default class Tracer {
     return this;
   }
 
-  use() {
+  use(...args: any[]) {
     return this;
   }
 

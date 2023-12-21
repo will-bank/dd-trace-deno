@@ -2,7 +2,6 @@
 
 const path = require('path')
 
-const ritm = require('../../src/lambda/runtime/ritm')
 const agent = require('../plugins/agent')
 
 const oldEnv = process.env
@@ -33,7 +32,6 @@ const restoreEnv = () => {
  */
 const loadAgent = ({ exporter = 'agent' } = {}) => {
   // Make sure the hook is re-registered
-  ritm.registerLambdaHook()
   return agent.load(null, [], {
     experimental: {
       exporter

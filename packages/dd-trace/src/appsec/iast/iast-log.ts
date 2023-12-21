@@ -1,8 +1,8 @@
 import log from '../../log/index.ts';
-import telemetryLogs from './telemetry/log/index.ts';
+import * as telemetryLogs from './telemetry/log/index.ts';
 import { calculateDDBasePath } from '../../util.ts';
 
-const ddBasePath = calculateDDBasePath(__dirname);
+const ddBasePath = calculateDDBasePath(new URL('.', import.meta.url).pathname);
 const EOL = '\n';
 const STACK_FRAME_LINE_REGEX = /^\s*at\s/gm;
 

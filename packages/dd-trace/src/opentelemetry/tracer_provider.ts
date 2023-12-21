@@ -1,6 +1,6 @@
-import { context, trace } from 'npm:@opentelemetry/api@1.4.1';
+import { context, trace } from 'https://esm.sh/@opentelemetry/api@1.4.1';
 
-import tracer from '../index.ts';
+import tracer from '../proxy.ts';
 
 import ContextManager from './context_manager.ts';
 import { MultiSpanProcessor, NoopSpanProcessor } from './span_processor.ts';

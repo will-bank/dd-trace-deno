@@ -2,8 +2,8 @@ import { normalizeSpan, truncateSpan } from './tags-processors.ts';
 import Chunk from './chunk.ts';
 import log from '../log/index.ts';
 import { isTrue } from '../util.ts';
-import coalesce from 'npm:koalas@1.0.2';
-import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
+import coalesce from 'https://esm.sh/koalas@1.0.2';
+import { Buffer } from 'node:buffer';
 
 const SOFT_LIMIT = 8 * 1024 * 1024; // 8MB
 
@@ -15,7 +15,6 @@ float64Array[0] = -1;
 const bigEndian = uInt8Float64Array[7] === 0;
 
 function formatSpan(span: { resource: string | any[]; meta: { [x: string]: string }; metrics: { [x: string]: any } }) {
-
   return normalizeSpan(truncateSpan(span, false));
 }
 
@@ -44,7 +43,6 @@ class AgentEncoder {
   count() {
     return this._traceCount;
   }
-
 
   encode(trace) {
     const bytes = this._traceBytes;
@@ -86,7 +84,6 @@ class AgentEncoder {
   reset() {
     this._reset();
   }
-
 
   _encode(bytes: { reserve: (arg0: number) => void; buffer: number[]; length: number }, trace) {
     this._encodeArrayPrefix(bytes, trace);
@@ -173,7 +170,6 @@ class AgentEncoder {
     bytes.buffer[offset + 4] = keysLength;
   }
 
-
   _encodeByte(bytes: { reserve: (arg0: number) => void; buffer: any[]; length: number }, value) {
     bytes.reserve(1);
 
@@ -185,7 +181,6 @@ class AgentEncoder {
 
     bytes.reserve(9);
     bytes.length += 9;
-
 
     id = id.toArray();
 
@@ -253,7 +248,6 @@ class AgentEncoder {
     this._encodeMapPrefix(bytes, validKeys.length);
 
     for (const key of validKeys) {
-
       this._encodeString(bytes, key);
 
       this._encodeValue(bytes, value[key]);
@@ -275,7 +269,6 @@ class AgentEncoder {
 
   _encodeString(bytes: { reserve: (arg0: number) => void; buffer: number[]; length: number }, value = '') {
     this._cacheString(value);
-
 
     const { start, end } = this._stringMap[value];
 

@@ -1,9 +1,9 @@
-import fs from 'node:fs';
+import { existsSync } from 'https://deno.land/std@0.204.0/fs/exists.ts';
 
 import log from './log/index.ts';
 
 function maybeStartServerlessMiniAgent(config: { isGCPFunction: any }) {
-  if (process.platform !== 'win32' && process.platform !== 'linux') {
+  if (Deno.build.os !== 'windows' && Deno.build.os !== 'linux') {
     log.error(`Serverless Mini Agent is only supported on Windows and Linux.`);
     return;
   }
@@ -14,7 +14,7 @@ function maybeStartServerlessMiniAgent(config: { isGCPFunction: any }) {
 
   // trying to spawn with an invalid path will return a non-descriptive error, so we want to catch
   // invalid paths and log our own error.
-  if (!fs.existsSync(rustBinaryPath)) {
+  if (!existsSync(rustBinaryPath)) {
     log.error('Serverless Mini Agent did not start. Could not find mini agent binary.');
     return;
   }
@@ -31,11 +31,11 @@ function getRustBinaryPath(config: { isGCPFunction: any }) {
   }
 
   const rustBinaryPathRoot = config.isGCPFunction ? '/workspace' : '/home/site/wwwroot';
-  const rustBinaryPathOsFolder = process.platform === 'win32'
+  const rustBinaryPathOsFolder = Deno.build.os === 'windows'
     ? 'datadog-serverless-agent-windows-amd64'
     : 'datadog-serverless-agent-linux-amd64';
 
-  const rustBinaryExtension = process.platform === 'win32' ? '.exe' : '';
+  const rustBinaryExtension = Deno.build.os === 'windows' ? '.exe' : '';
 
   const rustBinaryPath = `${rustBinaryPathRoot}/node_modules/@datadog/sma/${rustBinaryPathOsFolder}/\
 datadog-serverless-trace-mini-agent${rustBinaryExtension}`;

@@ -1,7 +1,7 @@
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
-import logCollector from './log-collector.ts';
-import { sendData } from '../../../../telemetry/send-data.ts';
+import dc from 'node:diagnostics_channel';
 import log from '../../../../log/index.ts';
+import { sendData } from '../../../../telemetry/send-data.ts';
+import logCollector from './log-collector.ts';
 
 const telemetryStartChannel = dc.channel('datadog:telemetry:start');
 const telemetryStopChannel = dc.channel('datadog:telemetry:stop');
@@ -18,7 +18,6 @@ function sendLogs() {
   try {
     const logs = logCollector.drain();
     if (logs) {
-
       sendData(config, application, host, 'logs', logs);
     }
   } catch (e) {
@@ -27,7 +26,6 @@ function sendLogs() {
 }
 
 function isLevelEnabled(level: string) {
-
   return isLogCollectionEnabled(config) && level !== 'DEBUG';
 }
 
@@ -52,7 +50,7 @@ function onTelemetryStart(msg: { config: any; application: any; host: any; heart
   if (msg.heartbeatInterval) {
     interval = setInterval(sendLogs, msg.heartbeatInterval);
 
-    interval.unref();
+    Deno.unrefTimer(interval);
   }
 
   return true;
@@ -68,7 +66,6 @@ function start() {
 }
 
 function stop() {
-
   if (!isLogCollectionEnabled(config)) return;
 
   log.info('IAST telemetry logs stopping');
@@ -84,7 +81,6 @@ function stop() {
   if (telemetryStopChannel.hasSubscribers) {
     telemetryStopChannel.unsubscribe(onTelemetryStop);
   }
-
 
   clearInterval(interval);
 }

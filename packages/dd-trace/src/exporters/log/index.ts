@@ -44,7 +44,7 @@ class LogExporter {
       }
     }
     logLine += TRACE_SUFFIX;
-    process.stdout.write(logLine);
+    Deno.stdout.writeSync(new TextEncoder().encode(logLine));
   }
 }
 

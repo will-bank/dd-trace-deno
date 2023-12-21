@@ -1,4 +1,4 @@
-import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
+import packageJson from '../../../../package.json.ts';
 import { sendData } from './send-data.ts';
 
 function getId(type: string, namespace: MetricsCollection, name, tags) {
@@ -20,7 +20,6 @@ function now() {
 }
 
 function mapToJsonArray(map: this | this) {
-
   return Array.from(map.values()).map((v: { toJSON: () => any }) => v.toJSON());
 }
 
@@ -64,7 +63,6 @@ class Metric {
   }
 
   toJSON() {
-
     const { metric, points, interval, type, tags, common } = this;
     return {
       metric,
@@ -78,7 +76,6 @@ class Metric {
 }
 
 class CountMetric extends Metric {
-
   get type() {
     return 'count';
   }
@@ -101,7 +98,6 @@ class CountMetric extends Metric {
 }
 
 class DistributionMetric extends Metric {
-
   get type() {
     return 'distribution';
   }
@@ -109,7 +105,6 @@ class DistributionMetric extends Metric {
   track(value = 1) {
     this.points.push(value);
   }
-
 
   toJSON() {
     const { metric, points, tags, common } = this;
@@ -123,7 +118,6 @@ class DistributionMetric extends Metric {
 }
 
 class GaugeMetric extends Metric {
-
   get type() {
     return 'gauge';
   }
@@ -147,7 +141,6 @@ class RateMetric extends Metric {
     this.interval = interval;
     this.rate = 0;
   }
-
 
   get type() {
     return 'rate';
@@ -180,7 +173,6 @@ class MetricsCollection extends Map {
   }
 
   reset() {
-
     for (const metric of this.values()) {
       metric.reset();
     }
@@ -191,7 +183,6 @@ class MetricsCollection extends Map {
   }
 
   toJSON() {
-
     if (!this.size) return;
 
     const series = mapToJsonArray(this)
@@ -210,10 +201,8 @@ class MetricsCollection extends Map {
 function getMetric(collection: MetricsCollection, type: string, name, tags, interval: undefined) {
   const metricId = getId(type, collection, name, tags);
 
-
   let metric = collection.get(metricId);
   if (metric) return metric;
-
 
   const Factory = metricsTypes[type];
   if (!Factory) {
@@ -240,26 +229,19 @@ class Namespace {
     this.distributions.reset();
   }
 
-
   count(name, tags: any[]) {
-
     return getMetric(this.metrics, 'count', name, tags);
   }
 
-
   gauge(name, tags) {
-
     return getMetric(this.metrics, 'gauge', name, tags);
   }
-
 
   rate(name, interval: undefined, tags) {
     return getMetric(this.metrics, 'rate', name, tags, interval);
   }
 
-
   distribution(name, tags) {
-
     return getMetric(this.distributions, 'distribution', name, tags);
   }
 
@@ -274,7 +256,6 @@ class Namespace {
 
 class NamespaceManager extends Map {
   namespace(name: string) {
-
     let ns = this.get(name);
     if (ns) return ns;
 
@@ -324,7 +305,6 @@ class NamespaceManager extends Map {
       os_version?: undefined;
     },
   ) {
-
     for (const namespace of this.values()) {
       const { metrics, distributions } = namespace.toJSON();
 

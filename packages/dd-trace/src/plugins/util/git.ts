@@ -1,7 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import os from 'node:os';
-import path from 'node:path';
-import fs from 'node:fs';
+import { join } from 'https://deno.land/std@0.204.0/path/join.ts';
 
 import log from '../../log/index.ts';
 import { sanitizedExec } from './exec.ts';
@@ -24,8 +22,7 @@ const GIT_REV_LIST_MAX_BUFFER = 8 * 1024 * 1024; // 8MB
 
 function isDirectory(path) {
   try {
-    const stats = fs.statSync(path);
-    return stats.isDirectory();
+    return Deno.statSync(path).isDirectory;
   } catch (e) {
     return false;
   }
@@ -117,7 +114,7 @@ function getCommitsToUpload(commitsToExclude: any[], commitsToInclude) {
 }
 
 function generatePackFilesForCommits(commitsToUpload: any[]) {
-  const tmpFolder = os.tmpdir();
+  const tmpFolder = Deno.makeTempDirSync();
 
   if (!isDirectory(tmpFolder)) {
     log.error(new Error('Provided path to generate packfiles is not a directory'));
@@ -125,8 +122,8 @@ function generatePackFilesForCommits(commitsToUpload: any[]) {
   }
 
   const randomPrefix = String(Math.floor(Math.random() * 10000));
-  const temporaryPath = path.join(tmpFolder, randomPrefix);
-  const cwdPath = path.join(Deno.cwd(), randomPrefix);
+  const temporaryPath = join(tmpFolder, randomPrefix);
+  const cwdPath = join(Deno.cwd(), randomPrefix);
 
   // Generates pack files to upload and
   // returns the ordered list of packfiles' paths

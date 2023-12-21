@@ -1,7 +1,4 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
-import FormData from '../../../exporters/common/form-data.ts';
+import { basename } from 'https://deno.land/std@0.204.0/path/basename.ts';
 import request from '../../../exporters/common/request.ts';
 
 import log from '../../../log/index.ts';
@@ -110,18 +107,21 @@ function uploadPackFile({ url, isEvpProxy, packFileToUpload, repositoryUrl, head
     },
   });
 
-
-  form.append('pushedSha', pushedSha, { contentType: 'application/json' });
+  form.append(
+    'pushedSha',
+    new Blob([pushedSha], { type: 'application/json' }),
+    );
 
   try {
-    const packFileContent = fs.readFileSync(packFileToUpload);
+    const packFileContent = Deno.readFileSync(packFileToUpload);
     // The original filename includes a random prefix, so we remove it here
-    const [, filename] = path.basename(packFileToUpload).split('-');
+    const [, filename] = basename(packFileToUpload).split('-');
 
-    form.append('packfile', packFileContent, {
-      filename,
-      contentType: 'application/octet-stream',
-    });
+    form.append(
+      'packfile',
+      new Blob([packFileContent], { type: 'application/octet-stream' }),
+      filename
+    );
   } catch (e) {
     callback(new Error(`Could not read "${packFileToUpload}"`));
     return;
@@ -132,11 +132,6 @@ function uploadPackFile({ url, isEvpProxy, packFileToUpload, repositoryUrl, head
   const options = {
     ...commonOptions,
     path: '/api/v2/git/repository/packfile',
-    headers: {
-      ...commonOptions.headers,
-
-      ...form.getHeaders(),
-    },
   };
 
   if (isEvpProxy) {

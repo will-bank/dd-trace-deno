@@ -1,5 +1,3 @@
-import { randomFillSync } from 'node:crypto';
-
 const UINT_MAX = 4294967296;
 
 const data = new Uint8Array(8 * 8192);
@@ -134,7 +132,7 @@ function toHexString(buffer: any[] | Uint8Array) {
 // Simple pseudo-random 64-bit ID generator.
 function pseudoRandom() {
   if (batch === 0) {
-    randomFillSync(data);
+    crypto.getRandomValues(data);
   }
 
   batch = (batch + 1) % 8192;

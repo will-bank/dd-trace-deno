@@ -1,8 +1,6 @@
 import { AgentEncoder } from './0.4.ts';
 import Chunk from './chunk.ts';
 
-import FormData from '../exporters/common/form-data.ts';
-
 const COVERAGE_PAYLOAD_VERSION = 2;
 const COVERAGE_KEYS_LENGTH = 2;
 
@@ -12,7 +10,6 @@ class CoverageCIVisibilityEncoder extends AgentEncoder {
   private _coveragesCount: number;
   private _coveragesOffset: any;
   constructor(...args) {
-
     super(...args);
     this._coverageBytes = new Chunk();
     this.form = new FormData();
@@ -29,13 +26,10 @@ class CoverageCIVisibilityEncoder extends AgentEncoder {
     this.encodeCodeCoverage(this._coverageBytes, coverage);
   }
 
-
   encodeCodeCoverage(bytes, coverage: { testId: any; sessionId: any; suiteId: any; files: any }) {
     if (coverage.testId) {
-
       this._encodeMapPrefix(bytes, 4);
     } else {
-
       this._encodeMapPrefix(bytes, 3);
     }
 
@@ -47,7 +41,6 @@ class CoverageCIVisibilityEncoder extends AgentEncoder {
 
     this._encodeId(bytes, coverage.suiteId);
     if (coverage.testId) {
-
       this._encodeString(bytes, 'span_id');
 
       this._encodeId(bytes, coverage.testId);
@@ -57,7 +50,6 @@ class CoverageCIVisibilityEncoder extends AgentEncoder {
 
     this._encodeArrayPrefix(bytes, coverage.files);
     for (const filename of coverage.files) {
-
       this._encodeMapPrefix(bytes, 1);
 
       this._encodeString(bytes, 'filename');
@@ -67,7 +59,6 @@ class CoverageCIVisibilityEncoder extends AgentEncoder {
   }
 
   reset() {
-
     this._reset();
     if (this._coverageBytes) {
       this._coverageBytes.length = 0;
@@ -117,20 +108,15 @@ class CoverageCIVisibilityEncoder extends AgentEncoder {
 
     this.form.append(
       'coverage1',
-      buffer,
-
-      {
-        filename: `coverage1.msgpack`,
-        contentType: 'application/msgpack',
-      },
+      new Blob([buffer], { type: 'application/msgpack' }),
+      `coverage1.msgpack`,
     );
     this.form.append(
       'event',
       // The intake requires a populated dictionary here. Simply having {} is not valid.
       // We use dummy: true but any other key/value pair would be valid.
-      JSON.stringify({ dummy: true }),
-
-      { filename: 'event.json', contentType: 'application/json' },
+      new Blob([JSON.stringify({ dummy: true })], { type: 'application/json' }),
+      'event.json',
     );
 
     const form = this.form;

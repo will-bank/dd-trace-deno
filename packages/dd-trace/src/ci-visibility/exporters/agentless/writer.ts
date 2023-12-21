@@ -10,15 +10,15 @@ class Writer extends BaseWriter {
   private _encoder: AgentlessCiVisibilityEncoder;
   private _evpProxyPrefix: string;
 
-  constructor({ url, tags, evpProxyPrefix = '' }) {
+  constructor(...args: any[]) {
+    super(...args);
 
-    super(...arguments);
+    const [{ url, tags, evpProxyPrefix = '' }] = args;
     const { 'runtime-id': runtimeId, env, service } = tags;
     this._url = url;
     this._encoder = new AgentlessCiVisibilityEncoder(this, { runtimeId, env, service });
     this._evpProxyPrefix = evpProxyPrefix;
   }
-
 
   _sendPayload(data, _, done: () => void) {
     const options = {
@@ -40,7 +40,6 @@ class Writer extends BaseWriter {
     }
 
     log.debug(() => `Request to the intake: ${safeJSONStringify(options)}`);
-
 
     request(data, options, (err, res) => {
       if (err) {

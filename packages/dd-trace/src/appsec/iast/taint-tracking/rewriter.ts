@@ -1,6 +1,6 @@
 import Module from 'node:module';
-import shimmer from '../../../../../datadog-shimmer.ts';
-import iastLog from './iast-log.ts';
+import * as shimmer from '../../../../../datadog-shimmer/index.ts';
+import iastLog from '../../iast/iast-log.ts';
 import { isNotLibraryFile, isPrivateModule } from './filter.ts';
 import { csiMethods } from './csi-methods.ts';
 import { getName } from '../telemetry/verbosity.ts';

@@ -1,13 +1,10 @@
-import { encode as hexEncode, decode as hexDecode } from "https://deno.land/std@0.201.0/encoding/hex.ts";
-import { format, URL } from 'node:url';
-import crypto from 'node:crypto';
-import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
 import { EventEmitter } from 'node:events';
-import Scheduler from './scheduler.ts';
-import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
+import { format } from 'node:url';
+import packageJson from '../../../../../package.json.ts';
 import request from '../../exporters/common/request.ts';
 import log from '../../log/index.ts';
 import { ACKNOWLEDGED, ERROR, UNACKNOWLEDGED } from './apply_states.ts';
+import Scheduler from './scheduler.ts';
 
 const clientId = crypto.randomUUID();
 
@@ -95,7 +92,7 @@ class RemoteConfigManager extends EventEmitter {
         is_tracer: true,
         client_tracer: {
           runtime_id: config.tags['runtime-id'],
-          language: 'node',
+          language: 'deno',
           tracer_version: packageJson.version,
           service: config.service,
           env: config.env,

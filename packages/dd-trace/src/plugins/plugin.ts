@@ -1,6 +1,6 @@
 // TODO: move anything related to tracing to TracingPlugin instead
 
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import dc from 'node:diagnostics_channel';
 import { storage } from '../../../datadog-core/index.ts';
 
 class Subscription {
@@ -68,11 +68,9 @@ export default class Plugin {
     this._tracerConfig = tracerConfig; // global tracer configuration
   }
 
-
   get tracer() {
     return this._tracer._tracer;
   }
-
 
   enter(span, store) {
     store = store || storage.getStore();
@@ -85,16 +83,13 @@ export default class Plugin {
     storage.enterWith({ noop: true });
   }
 
-
   addSub(channelName, handler: (arg0: any, arg1: any) => void) {
     this._subscriptions.push(new Subscription(channelName, handler));
   }
 
-
   addBind(channelName, transform: (arg0: any) => any) {
     this._bindings.push(new StoreBinding(channelName, transform));
   }
-
 
   addError(error) {
     const store = storage.getStore();
@@ -106,7 +101,7 @@ export default class Plugin {
     }
   }
 
-  configure(config: { enabled?: any }) {
+  configure(config: { enabled?: any } | boolean) {
     if (typeof config === 'boolean') {
       config = { enabled: config };
     }

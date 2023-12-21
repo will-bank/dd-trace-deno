@@ -3,9 +3,9 @@ import id from '../id.ts';
 import { storage } from '../../../datadog-core/index.ts'; // TODO: noop storage?
 
 class NoopSpan {
-  private _store: any;
-  private _noopTracer: any;
-  private _noopContext: NoopSpanContext;
+  public _store: any;
+  public _noopTracer: any;
+  public _noopContext: NoopSpanContext;
   constructor(tracer, parent: { _traceId: any; _spanId: any; _baggageItems: any }) {
     this._store = storage.getStore();
     this._noopTracer = tracer;

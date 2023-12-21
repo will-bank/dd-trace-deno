@@ -1,18 +1,16 @@
 // encoding used here is sha256
 // other languages use FNV1
 // this inconsistency is ok because hashes do not need to be consistent across services
-import * as hex from "https://deno.land/std@0.201.0/encoding/hex.ts";
-import crypto from 'node:crypto';
-import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
+import { Buffer } from 'node:buffer';
 import { decodeVarint, encodeVarint } from './encoding.ts';
-import LRUCache from 'npm:lru-cache@7.14.0';
+import LRUCache from 'https://esm.sh/lru-cache@7.14.0';
+import { crypto } from 'https://deno.land/std@0.204.0/crypto/crypto.ts';
 
 const options = { max: 500 };
 const cache = new LRUCache(options);
 
 function shaHash(checkpointString: string) {
-  const hash = crypto.createHash('md5').update(checkpointString).digest('hex').slice(0, 16);
-  return new TextEncoder().encode(hex.decode(hash));
+  return crypto.subtle.digestSync('SHA-1', new TextEncoder().encode(checkpointString));
 }
 
 function computePathwayHash(service, env, edgeTags: any[], parentHash: { toString: () => string }) {
@@ -21,7 +19,7 @@ function computePathwayHash(service, env, edgeTags: any[], parentHash: { toStrin
     return cache.get(key);
   }
   const currentHash = shaHash(`${service}${env}` + edgeTags.join(''));
-  const buf = Buffer.concat([currentHash, parentHash], 16);
+  const buf = Buffer.concat([new Uint8Array(currentHash), new Uint8Array(parentHash)], 16);
   const val = shaHash(buf.toString());
   cache.set(key, val);
   return val;

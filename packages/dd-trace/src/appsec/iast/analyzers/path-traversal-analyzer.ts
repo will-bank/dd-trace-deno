@@ -1,9 +1,9 @@
-import path from 'node:path';
-
-import InjectionAnalyzer from './injection-analyzer.ts';
-import { getIastContext } from '../iast-context.ts';
+import { join } from 'https://deno.land/std@0.204.0/path/join.ts';
+import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
 import { storage } from '../../../../../datadog-core/index.ts';
+import { getIastContext } from '../iast-context.ts';
 import { PATH_TRAVERSAL } from '../vulnerabilities.ts';
+import InjectionAnalyzer from './injection-analyzer.ts';
 
 const ignoredOperations = ['dir.close', 'close'];
 
@@ -14,7 +14,7 @@ class PathTraversalAnalyzer extends InjectionAnalyzer {
     super(PATH_TRAVERSAL);
 
     this.exclusionList = [
-      path.join('node_modules', 'send') + path.sep,
+      join('node_modules', 'send') + SEP,
     ];
 
     this.internalExclusionList = [

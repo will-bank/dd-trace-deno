@@ -1,6 +1,6 @@
 import { normalizeSpan, truncateSpan } from './tags-processors.ts';
 import { AgentEncoder } from './0.4.ts';
-import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
+import packageJson from '../../../../package.json.ts';
 import id from '../../../dd-trace/src/id.ts';
 const ENCODING_VERSION = 1;
 
@@ -18,7 +18,6 @@ function formatSpan(span: { type?: any; meta: any; resource?: string | any[]; me
     encodingVersion = 2;
   }
   return {
-
     type: ALLOWED_CONTENT_TYPES.includes(span.type) ? span.type : 'span',
     version: encodingVersion,
 
@@ -67,28 +66,23 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
       metrics: any;
     },
   ) {
-
     this._encodeMapPrefix(bytes, TEST_SUITE_KEYS_LENGTH);
 
     this._encodeString(bytes, 'type');
 
     this._encodeString(bytes, content.type);
 
-
     this._encodeString(bytes, 'test_session_id');
 
     this._encodeId(bytes, content.trace_id);
-
 
     this._encodeString(bytes, 'test_module_id');
 
     this._encodeId(bytes, content.parent_id);
 
-
     this._encodeString(bytes, 'test_suite_id');
 
     this._encodeId(bytes, content.span_id);
-
 
     this._encodeString(bytes, 'error');
     this._encodeNumber(bytes, content.error);
@@ -140,23 +134,19 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
       metrics: any;
     },
   ) {
-
     this._encodeMapPrefix(bytes, TEST_MODULE_KEYS_LENGTH);
 
     this._encodeString(bytes, 'type');
 
     this._encodeString(bytes, content.type);
 
-
     this._encodeString(bytes, 'test_session_id');
 
     this._encodeId(bytes, content.trace_id);
 
-
     this._encodeString(bytes, 'test_module_id');
 
     this._encodeId(bytes, content.span_id);
-
 
     this._encodeString(bytes, 'error');
     this._encodeNumber(bytes, content.error);
@@ -207,18 +197,15 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
       metrics: any;
     },
   ) {
-
     this._encodeMapPrefix(bytes, TEST_SESSION_KEYS_LENGTH);
 
     this._encodeString(bytes, 'type');
 
     this._encodeString(bytes, content.type);
 
-
     this._encodeString(bytes, 'test_session_id');
 
     this._encodeId(bytes, content.trace_id);
-
 
     this._encodeString(bytes, 'error');
     this._encodeNumber(bytes, content.error);
@@ -277,7 +264,6 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
     this._encodeMapPrefix(bytes, totalKeysLength);
 
     if (content.type) {
-
       this._encodeString(bytes, 'type');
 
       this._encodeString(bytes, content.type);
@@ -329,7 +315,6 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
      */
 
     if (content.meta.test_session_id) {
-
       this._encodeString(bytes, 'test_session_id');
 
       this._encodeId(bytes, id(content.meta.test_session_id, 10));
@@ -337,9 +322,7 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
       delete content.meta.test_session_id;
     }
 
-
     if (content.meta.test_module_id) {
-
       this._encodeString(bytes, 'test_module_id');
 
       this._encodeId(bytes, id(content.meta.test_module_id, 10));
@@ -347,16 +330,13 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
       delete content.meta.test_module_id;
     }
 
-
     if (content.meta.test_suite_id) {
-
       this._encodeString(bytes, 'test_suite_id');
 
       this._encodeId(bytes, id(content.meta.test_suite_id, 10));
 
       delete content.meta.test_suite_id;
     }
-
 
     this._encodeString(bytes, 'meta');
 
@@ -375,35 +355,25 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
     },
     event: object,
   ) {
-
     this._encodeMapPrefix(bytes, Object.keys(event).length);
 
     this._encodeString(bytes, 'type');
 
     this._encodeString(bytes, event.type);
 
-
     this._encodeString(bytes, 'version');
 
     this._encodeNumber(bytes, event.version);
 
-
     this._encodeString(bytes, 'content');
 
     if (event.type === 'span' || event.type === 'test') {
-
       this._encodeEventContent(bytes, event.content);
-
     } else if (event.type === 'test_suite_end') {
-
       this._encodeTestSuite(bytes, event.content);
-
     } else if (event.type === 'test_module_end') {
-
       this._encodeTestModule(bytes, event.content);
-
     } else if (event.type === 'test_session_end') {
-
       this._encodeTestSession(bytes, event.content);
     }
   }
@@ -417,7 +387,6 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
     value: number,
   ) {
     if (Math.floor(value) !== value) { // float 64
-
       return this._encodeFloat(bytes, value);
     }
 
@@ -462,7 +431,6 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
     const rawEvents = trace.map(formatSpan);
 
     const testSessionEvents = rawEvents.filter(
-
       (event: { type: string }) =>
         event.type === 'test_session_end' || event.type === 'test_suite_end' || event.type === 'test_module_end',
     );
@@ -478,7 +446,6 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
   }
 
   makePayload() {
-
     const bytes = this._traceBytes;
     const eventsOffset = this._eventsOffset;
     const eventsCount = this._eventCount;
@@ -515,14 +482,11 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
     };
 
     if (this.env) {
-
       payload.metadata['*'].env = this.env;
     }
     if (this.runtimeId) {
-
       payload.metadata['*']['runtime-id'] = this.runtimeId;
     }
-
 
     this._encodeMapPrefix(bytes, Object.keys(payload).length);
 
@@ -545,7 +509,6 @@ class AgentlessCiVisibilityEncoder extends AgentEncoder {
   }
 
   reset() {
-
     this._reset();
     this._eventCount = 0;
 

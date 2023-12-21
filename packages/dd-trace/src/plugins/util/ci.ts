@@ -1,5 +1,3 @@
-import { URL } from 'node:url';
-
 import {
   CI_ENV_VARS,
   CI_JOB_NAME,

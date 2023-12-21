@@ -1,5 +1,3 @@
-import { URL } from 'node:url';
-
 import { sendGitMetadata as sendGitMetadataRequest } from './git/git_metadata.ts';
 const { getItrConfiguration: getItrConfigurationRequest } = await import(
   '../intelligent-test-runner/get-itr-configuration.ts'

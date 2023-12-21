@@ -1,8 +1,6 @@
 import tracerLogger from '../../log/index.ts'; // path to require tracer logger
 
-import https from 'node:https';
-
-class ExternalLogger {
+export class ExternalLogger {
   enabled: boolean;
   ddsource: any;
   hostname: any;
@@ -14,7 +12,7 @@ class ExternalLogger {
   endpoint: string;
   site: string;
   intake: string;
-  headers: { 'DD-API-KEY': any; 'Content-Type': string };
+  headers: { 'DD-API-KEY': string; 'Content-Type': string };
   timer: any;
   // Note: these attribute names match the corresponding entry in the JSON payload.
   constructor({
@@ -47,7 +45,9 @@ class ExternalLogger {
     this.timer = setInterval(() => {
       this.flush();
 
-    }, this.interval).unref();
+    }, this.interval);
+
+    Deno.unrefTimer(this.timer);
 
     tracerLogger.debug(`started log writer to https://${this.intake}${this.endpoint}`);
   }
@@ -102,7 +102,7 @@ class ExternalLogger {
   }
 
   // Flushes logs with optional callback for when the call is complete
-  flush(cb = () => {}) {
+  flush(cb = (err?: Error) => {}) {
     let logs;
 
     let numLogs;
@@ -110,7 +110,7 @@ class ExternalLogger {
 
     if (!this.queue.length) {
 
-      setImmediate(() => cb());
+      queueMicrotask(() => cb());
       return;
     }
 
@@ -123,7 +123,7 @@ class ExternalLogger {
     } catch (error) {
       tracerLogger.error(`failed to encode ${numLogs} logs`);
 
-      setImmediate(() => cb(error));
+      queueMicrotask(() => cb(error));
       return;
     }
 
@@ -136,19 +136,15 @@ class ExternalLogger {
       timeout: this.timeout,
     };
 
-    const req = https.request(options, (res: { statusCode: any }) => {
-      tracerLogger.info(`statusCode: ${res.statusCode}`);
-    });
-    req.once('error', (e: { message: any }) => {
+    fetch(`https://${this.intake}${this.endpoint}`, {
+      method: 'POST',
+      headers: this.headers,
+      signal: AbortSignal.timeout(this.timeout),
+      body: encodedLogs,
+    }).then((res) => {
+      tracerLogger.info(`statusCode: ${res.status}`);
 
-      tracerLogger.error(`failed to send ${numLogs} log(s), with error ${e.message}`);
-
-      cb(e);
-    });
-    req.write(encodedLogs);
-    req.end();
-    req.once('response', (res: { statusCode: number }) => {
-      if (res.statusCode >= 400) {
+      if (res.status >= 400) {
 
         const error = new Error(`failed to send ${numLogs} logs, received response code ${res.statusCode}`);
         tracerLogger.error(error.message);
@@ -157,16 +153,16 @@ class ExternalLogger {
         return;
       }
       cb();
+    }).catch((e) => {
+      tracerLogger.error(`failed to send ${numLogs} log(s), with error ${e.message}`);
+      cb();
     });
   }
 }
 
-class NoopExternalLogger {
+export class NoopExternalLogger {
   log() {}
   enqueue() {}
   shutdown() {}
   flush() {}
 }
-
-module.exports.ExternalLogger = ExternalLogger;
-module.exports.NoopExternalLogger = NoopExternalLogger;

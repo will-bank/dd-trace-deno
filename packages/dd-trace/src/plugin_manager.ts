@@ -1,4 +1,4 @@
-import dc from 'npm:dd-trace@4.13.1/packages/diagnostics_channel/index.js';
+import dc from 'node:diagnostics_channel';
 import { isFalse } from './util.ts';
 import plugins from './plugins/index.ts';
 import log from './log/index.ts';
@@ -7,11 +7,7 @@ import Nomenclature from './service-naming/index.ts';
 const loadChannel = dc.channel('dd-trace:instrumentation:load');
 
 // instrument everything that needs Plugin System V2 instrumentation
-import '../../datadog-instrumentations/index.ts';
-if (Deno.env.get('AWS_LAMBDA_FUNCTION_NAME') !== undefined) {
-  // instrument lambda environment
-  await import('./lambda/index.ts');
-}
+// import 'https://esm.sh/dd-trace@4.13.1/packages/datadog-instrumentations/index.js';
 
 const DD_TRACE_DISABLED_PLUGINS = Deno.env.get('DD_TRACE_DISABLED_PLUGINS');
 
@@ -28,7 +24,8 @@ loadChannel.subscribe(({ name }) => {
 });
 
 // Globals
-maybeEnable(await import('npm:dd-trace@4.13.1/packages/datadog-plugin-fetch/src/index.js'));
+// maybeEnable((await import('https://esm.sh/dd-trace@4.13.1/packages/datadog-plugin-fetch/src/index.js')).default);
+maybeEnable((await import('./plugins/log_plugin.ts')).default);
 
 function maybeEnable(Plugin: { id: string }) {
   if (!Plugin || typeof Plugin !== 'function') return;
@@ -92,7 +89,7 @@ export default class PluginManager {
   }
 
   // TODO: merge config instead of replacing
-  configurePlugin(name: string | number, pluginConfig) {
+  configurePlugin(name: string | number, pluginConfig?: any) {
     const enabled = this._isEnabled(pluginConfig);
 
     this._configsByName[name] = {

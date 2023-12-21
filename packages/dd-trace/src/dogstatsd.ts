@@ -1,10 +1,9 @@
 import { lookup } from 'node:dns'; // cache to avoid instrumentation
-import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
+import { Buffer } from 'node:buffer';
 import request from './exporters/common/request.ts';
 import dgram from 'node:dgram';
 import { isIP } from 'node:net';
 import log from './log/index.ts';
-import { format, URL } from 'node:url';
 
 const MAX_BUFFER_SIZE = 1024; // limit from the agent
 
@@ -40,8 +39,16 @@ class DogStatsDClient {
     this._queue = [];
     this._buffer = '';
     this._offset = 0;
-    this._udp4 = this._socket('udp4');
-    this._udp6 = this._socket('udp6');
+    this._udp4 = Deno.listenDatagram({
+      transport: 'udp',
+      hostname: '127.0.0.1',
+      port: 0,
+    });
+    this._udp6 = Deno.listenDatagram({
+      transport: 'udp',
+      hostname: '::1',
+      port: 0,
+    });
   }
 
   increment(stat, value, tags: any[]) {
@@ -144,15 +151,6 @@ class DogStatsDClient {
     return this._queue;
   }
 
-  _socket(type: string) {
-    const socket = dgram.createSocket(type);
-
-    socket.on('error', () => {});
-    socket.unref();
-
-    return socket;
-  }
-
   static generateClientConfig(config = {}) {
     const tags: string[] = [];
 
@@ -181,11 +179,7 @@ class DogStatsDClient {
     if (config.url) {
       clientConfig.metricsProxyUrl = config.url;
     } else if (config.port) {
-      clientConfig.metricsProxyUrl = new URL(format({
-        protocol: 'http:',
-        hostname: config.hostname || 'localhost',
-        port: config.port,
-      }));
+      clientConfig.metricsProxyUrl = new URL(`http://${config.hostname || 'localhost'}:${config.port}`);
     }
 
     return clientConfig;

@@ -1,17 +1,13 @@
-import path from 'node:path';
-import process from 'node:process';
+import { isAbsolute } from 'https://deno.land/std@0.204.0/path/is_absolute.ts';
+import { join } from 'https://deno.land/std@0.204.0/path/join.ts';
+import { relative } from 'https://deno.land/std@0.204.0/path/relative.ts';
+import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
 import { calculateDDBasePath } from '../../util.ts';
-const pathLine = {
-  getFirstNonDDPathAndLine,
-  getNodeModulesPaths,
-  getFirstNonDDPathAndLineFromCallsites, // Exported only for test purposes
-  calculateDDBasePath, // Exported only for test purposes
 
-  ddBasePath: calculateDDBasePath(__dirname), // Only for test purposes
-};
+export {calculateDDBasePath};
 
 const EXCLUDED_PATHS = [
-  path.join(path.sep, 'node_modules', 'diagnostics_channel'),
+  join(SEP, 'node_modules', 'diagnostics_channel'),
 ];
 const EXCLUDED_PATH_PREFIXES = [
   'node:diagnostics_channel',
@@ -43,17 +39,17 @@ function getCallSiteInfo() {
   return callsiteList;
 }
 
-function getFirstNonDDPathAndLineFromCallsites(callsites: string | any[], externallyExcludedPaths) {
+export function getFirstNonDDPathAndLineFromCallsites(callsites: string | any[], externallyExcludedPaths) {
   if (callsites) {
     for (let i = 0; i < callsites.length; i++) {
       const callsite = callsites[i];
       const filepath = callsite.getFileName();
       if (!isExcluded(callsite, externallyExcludedPaths) && filepath.indexOf(pathLine.ddBasePath) === -1) {
         return {
-          path: path.relative(Deno.cwd(), filepath),
+          path: relative(Deno.cwd(), filepath),
           line: callsite.getLineNumber(),
           column: callsite.getColumnNumber(),
-          isInternal: !path.isAbsolute(filepath),
+          isInternal: !isAbsolute(filepath),
         };
       }
     }
@@ -87,21 +83,21 @@ function isExcluded(callsite: { isNative: () => any; getFileName: () => any }, e
   return false;
 }
 
-function getFirstNonDDPathAndLine(externallyExcludedPaths: void) {
+export function getFirstNonDDPathAndLine(externallyExcludedPaths: void) {
   return getFirstNonDDPathAndLineFromCallsites(getCallSiteInfo(), externallyExcludedPaths);
 }
 
-function getNodeModulesPaths(...paths) {
+export function getNodeModulesPaths(...paths) {
 
   const nodeModulesPaths = [];
 
   paths.forEach((p) => {
     const pathParts = p.split('/');
-    nodeModulesPaths.push(path.join('node_modules', ...pathParts));
+    nodeModulesPaths.push(join('node_modules', ...pathParts));
   });
 
 
   return nodeModulesPaths;
 }
 
-export default pathLine;
+export const ddBasePath = calculateDDBasePath(new URL('.', import.meta.url).pathname);

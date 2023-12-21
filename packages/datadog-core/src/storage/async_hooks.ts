@@ -4,12 +4,7 @@ import { executionAsyncId } from 'node:async_hooks';
 import AsyncResourceStorage from './async_resource.ts';
 
 export default class AsyncHooksStorage extends AsyncResourceStorage {
-  private _resources: any;
-  constructor() {
-    super();
-
-    this._resources = new Map();
-  }
+  private _resources = new Map();
 
   disable() {
     super.disable();
@@ -34,7 +29,7 @@ export default class AsyncHooksStorage extends AsyncResourceStorage {
     this._resources.delete(asyncId);
   }
 
-  _executionAsyncResource() {
+  override _executionAsyncResource() {
     const asyncId = executionAsyncId();
 
     let resource = this._resources.get(asyncId);

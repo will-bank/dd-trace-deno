@@ -1,15 +1,14 @@
-import api from 'npm:@opentelemetry/api@1.4.1';
+import api from 'https://esm.sh/@opentelemetry/api@1.4.1';
 
 import { performance } from 'node:perf_hooks';
 const { timeOrigin } = performance;
 
-import { timeInputToHrTime } from 'npm:@opentelemetry/core@1.15.2';
+import { timeInputToHrTime } from 'https://esm.sh/@opentelemetry/core@1.15.2';
 
-import tracer from '../index.ts';
+import tracer from '../proxy.ts';
 import DatadogSpan from '../opentracing/span.ts';
 import { ERROR_MESSAGE, ERROR_STACK, ERROR_TYPE } from '../constants.ts';
-import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
-const { RESOURCE_NAME, SERVICE_NAME } = tags;
+import { RESOURCE_NAME, SERVICE_NAME } from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
 
 import SpanContext from './span_context.ts';
 

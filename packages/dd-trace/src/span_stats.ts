@@ -1,9 +1,7 @@
-import os from 'node:os';
-import pkg from './pkg.ts';
-import packageJson from 'npm:dd-trace@4.13.1/package.json' assert { type: 'json' };
-import { LogCollapsingLowestDenseDDSketch } from 'npm:@datadog/sketches-js@2.1.0';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
+import packageJson from '../../../package.json.ts';
+import { LogCollapsingLowestDenseDDSketch } from 'https://esm.sh/@datadog/sketches-js@2.1.0';
 import { ORIGIN_KEY, TOP_LEVEL_KEY } from './constants.ts';
-import * as tags from 'npm:dd-trace@4.13.1/ext/tags.js';
 const { HTTP_STATUS_CODE, MEASURED } = tags;
 
 import { SpanStatsExporter } from './exporters/span-stats/index.ts';
@@ -154,7 +152,7 @@ class SpanStatsProcessor {
     this.interval = interval;
     this.bucketSizeNs = interval * 1e9;
     this.buckets = new TimeBuckets();
-    this.hostname = os.hostname();
+    this.hostname = Deno.hostname();
     this.enabled = enabled;
     this.env = env;
     this.tags = tags || {};
@@ -162,7 +160,7 @@ class SpanStatsProcessor {
 
     if (enabled) {
       this.timer = setInterval(this.onInterval.bind(this), interval * 1e3);
-      this.timer.unref();
+      Deno.unrefTimer(this.timer);
     }
   }
 
@@ -173,7 +171,7 @@ class SpanStatsProcessor {
     this.exporter.export({
       Hostname: this.hostname,
       Env: this.env,
-      Version: pkg.version,
+      Version: Deno.env.get('DD_VERSION'),
       Stats: serialized,
       Lang: 'typescript',
       TracerVersion: packageJson.version,
