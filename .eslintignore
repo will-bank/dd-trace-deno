@@ -1,9 +1,0 @@
-coverage
-dist
-docs
-out
-node_modules
-versions
-acmeair-nodejs
-vendor
-integration-tests/esbuild/out.js

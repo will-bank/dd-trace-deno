@@ -16,7 +16,6 @@ class SetCookiesHeaderInterceptor extends Plugin {
         }
         const alreadyCheckedCookies = this._getAlreadyCheckedCookiesInResponse(res);
 
-
         let location;
         allCookies.forEach((cookieString: string) => {
           if (!alreadyCheckedCookies.includes(cookieString)) {
@@ -31,7 +30,6 @@ class SetCookiesHeaderInterceptor extends Plugin {
     });
   }
 
-
   _parseCookie(cookieString: string, location) {
     const cookieParts = cookieString.split(';');
     const nameValueParts = cookieParts[0].split('=');
@@ -41,7 +39,6 @@ class SetCookiesHeaderInterceptor extends Plugin {
 
     return { cookieName, cookieValue, cookieProperties, cookieString, location };
   }
-
 
   _getAlreadyCheckedCookiesInResponse(res) {
     let alreadyCheckedCookies = this.cookiesInRequest.get(res);

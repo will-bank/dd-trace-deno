@@ -11,16 +11,13 @@ function createAgentClass(BaseAgent) {
       super({ keepAlive, maxSockets });
     }
 
-
     createConnection(...args) {
       return this._noop(() => super.createConnection(...args));
     }
 
-
     keepSocketAlive(...args) {
       return this._noop(() => super.keepSocketAlive(...args));
     }
-
 
     reuseSocket(...args) {
       return this._noop(() => super.reuseSocket(...args));

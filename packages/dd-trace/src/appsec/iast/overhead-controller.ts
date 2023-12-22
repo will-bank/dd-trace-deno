@@ -18,7 +18,6 @@ const OPERATIONS = {
     },
     name: REPORT_VULNERABILITY,
     initialTokenBucketSize() {
-
       return typeof config.maxContextOperations === 'number' ? config.maxContextOperations : 2;
     },
     initContext: function (context: { tokens: { [x: string]: any } }) {
@@ -33,7 +32,6 @@ function _getNewContext() {
   };
 
   for (const operation in OPERATIONS) {
-
     OPERATIONS[operation].initContext(oceContext);
   }
 
@@ -48,7 +46,6 @@ function _getContext(iastContext: { [x: string]: any }) {
 }
 
 function _resetGlobalContext() {
-
   Object.assign(GLOBAL_OCE_CONTEXT, _getNewContext());
 }
 
@@ -62,11 +59,7 @@ function acquireRequest(
   },
 ) {
   if (availableRequest > 0) {
-
-    const sampling = config && typeof config.requestSampling === 'number'
-
-      ? config.requestSampling
-      : 30;
+    const sampling = config && typeof config.requestSampling === 'number' ? config.requestSampling : 30;
     if (rootSpan.context().toSpanId().slice(-2) <= sampling) {
       availableRequest--;
       return true;
@@ -76,7 +69,6 @@ function acquireRequest(
 }
 
 function releaseRequest() {
-
   if (availableRequest < config.maxConcurrentRequests) {
     availableRequest++;
   }
@@ -97,7 +89,6 @@ function configure(cfg) {
 }
 
 function startGlobalContext() {
-
   if (resetGlobalContextInterval) return;
   _resetGlobalContext();
   resetGlobalContextInterval = setInterval(() => {
@@ -108,9 +99,7 @@ function startGlobalContext() {
 }
 
 function finishGlobalContext() {
-
   if (resetGlobalContextInterval) {
-
     clearInterval(resetGlobalContextInterval);
     resetGlobalContextInterval = null;
   }

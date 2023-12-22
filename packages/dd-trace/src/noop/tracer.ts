@@ -10,14 +10,11 @@ class NoopTracer {
     this._span = new Span(this);
   }
 
-
   configure(options) {}
-
 
   trace(name, options, fn: (arg0: any, arg1: () => void) => any) {
     return fn(this._span, () => {});
   }
-
 
   wrap(name, options, fn) {
     return fn;
@@ -34,14 +31,11 @@ class NoopTracer {
   setUrl() {
   }
 
-
   startSpan(name, options) {
     return this._span;
   }
 
-
   inject(spanContext, format, carrier) {}
-
 
   extract(format, carrier) {
     return this._span.context();

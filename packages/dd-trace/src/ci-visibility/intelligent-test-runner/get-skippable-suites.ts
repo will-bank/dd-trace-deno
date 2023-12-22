@@ -1,7 +1,6 @@
 import request from '../../exporters/common/request.ts';
 
 function getSkippableSuites({
-
   url,
 
   isEvpProxy,
@@ -26,7 +25,6 @@ function getSkippableSuites({
 
   custom,
   testLevel = 'suite',
-
 }, done) {
   const options = {
     path: '/api/v2/ci/tests/skippable',
@@ -60,7 +58,6 @@ function getSkippableSuites({
       return done(new Error(`${messagePrefix} API key is not defined.`));
     }
 
-
     options.headers['dd-api-key'] = apiKey;
 
     options.headers['dd-application-key'] = appKey;
@@ -87,7 +84,6 @@ function getSkippableSuites({
     },
   });
 
-
   request(data, options, (err, res: string) => {
     if (err) {
       done(err);
@@ -96,9 +92,7 @@ function getSkippableSuites({
       try {
         skippableSuites = JSON.parse(res)
           .data
-
           .filter(({ type }) => type === testLevel)
-
           .map(({ attributes: { suite, name } }) => {
             if (testLevel === 'suite') {
               return suite;

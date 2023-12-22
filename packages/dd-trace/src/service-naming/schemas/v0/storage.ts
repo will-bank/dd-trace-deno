@@ -18,7 +18,6 @@ function mysqlServiceName({ tracerService, pluginConfig, dbConfig, system }) {
 }
 
 function withSuffixFunction(suffix: string) {
-
   return ({ tracerService, pluginConfig, params }) => {
     if (typeof pluginConfig.service === 'function') {
       return pluginConfig.service(params);
@@ -42,7 +41,6 @@ export const client = {
     serviceName: ({ tracerService, pluginConfig, system }) => pluginConfig.service || fromSystem(tracerService, system),
   },
   couchbase: {
-
     opName: ({ operation }) => `couchbase.${operation}`,
 
     serviceName: ({ tracerService, pluginConfig }) => pluginConfig.service || `${tracerService}-couchbase`,

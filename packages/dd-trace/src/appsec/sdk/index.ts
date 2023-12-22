@@ -13,16 +13,13 @@ class AppsecSdk {
     }
   }
 
-
   trackUserLoginSuccessEvent(user: { id: any }, metadata) {
     return trackUserLoginSuccessEvent(this._tracer, user, metadata);
   }
 
-
   trackUserLoginFailureEvent(userId, exists, metadata) {
     return trackUserLoginFailureEvent(this._tracer, userId, exists, metadata);
   }
-
 
   trackCustomEvent(eventName, metadata) {
     return trackCustomEvent(this._tracer, eventName, metadata);
@@ -31,7 +28,6 @@ class AppsecSdk {
   isUserBlocked(user: { id: any }) {
     return checkUserAndSetUser(this._tracer, user);
   }
-
 
   blockRequest(req, res) {
     return blockRequest(this._tracer, req, res);

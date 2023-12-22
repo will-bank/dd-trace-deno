@@ -19,7 +19,6 @@ export default class WAFManager {
     Reporter.reportWafInit(this.ddwafVersion, this.ddwaf.rulesInfo);
   }
 
-
   _loadDDWAF(rules) {
     try {
       // require in `try/catch` because this can throw at require time
@@ -33,7 +32,6 @@ export default class WAFManager {
       throw err;
     }
   }
-
 
   getWAFContext(req) {
     let wafContext = contexts.get(req);
@@ -51,7 +49,6 @@ export default class WAFManager {
 
     return wafContext;
   }
-
 
   update(newRules) {
     this.ddwaf.update(newRules);

@@ -14,9 +14,7 @@ class Identifier {
   private _buffer: any[] | Uint8Array;
   constructor(value?: string | any[], radix = 16) {
     this._isUint64BE = true; // msgpack-lite compatibility
-    this._buffer = radix === 16
-      ? createBuffer(value)
-      : fromString(value, radix);
+    this._buffer = radix === 16 ? createBuffer(value) : fromString(value, radix);
   }
 
   toString(radix = 16) {
@@ -49,7 +47,6 @@ function createBuffer(value?: string) {
   const bytes = size / 2;
   const buffer = new Array(bytes);
 
-
   value = value.padStart(size, '0');
 
   for (let i = 0; i < bytes; i++) {
@@ -73,11 +70,9 @@ function fromString(str: string | any[], raddix: number | RegExp) {
   const sign = pos;
 
   while (pos < len) {
-
     const chr = parseInt(str[pos++], raddix);
 
     if (!(chr >= 0)) break; // NaN
-
 
     low = low * raddix + chr;
 
@@ -103,7 +98,6 @@ function fromString(str: string | any[], raddix: number | RegExp) {
 
 // Convert a buffer to a numerical string.
 function toNumberString(buffer: string | any[] | Uint8Array, radix: number) {
-
   let high = readInt32(buffer, buffer.length - 8);
 
   let low = readInt32(buffer, buffer.length - 4);

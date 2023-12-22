@@ -1,7 +1,6 @@
 import InboundPlugin from './inbound.ts';
 
 class ServerPlugin extends InboundPlugin {
-
   static get operation() {
     return 'request';
   }

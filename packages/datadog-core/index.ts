@@ -1,7 +1,7 @@
-'use strict'
+'use strict';
 
 import LocalStorage from './src/storage/index.ts';
 
-const storage = new LocalStorage()
+const storage = new LocalStorage();
 
-export { storage }
+export { storage };

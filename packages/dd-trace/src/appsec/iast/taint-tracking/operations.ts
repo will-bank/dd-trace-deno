@@ -55,7 +55,6 @@ function taintObject(iastContext: { [x: string]: any }, object, type, keyTaintin
 
     const visited = new WeakSet();
     while (queue.length > 0) {
-
       const { parent, property, value, key } = queue.pop();
       if (value === null) {
         continue;
@@ -71,7 +70,6 @@ function taintObject(iastContext: { [x: string]: any }, object, type, keyTaintin
 
               parent[taintedProperty] = tainted;
             } else {
-
               parent[key] = tainted;
             }
           }
@@ -130,12 +128,10 @@ function enableTaintOperations(telemetryVerbosity: number) {
     onRemoveTransaction = onRemoveTransactionInformationTelemetry;
   }
 
-
   global._ddiast = getTaintTrackingImpl(telemetryVerbosity);
 }
 
 function disableTaintOperations() {
-
   global._ddiast = getTaintTrackingNoop();
 }
 

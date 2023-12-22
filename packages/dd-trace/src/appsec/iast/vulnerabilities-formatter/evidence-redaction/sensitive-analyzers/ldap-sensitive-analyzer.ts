@@ -15,7 +15,6 @@ class LdapSensitiveAnalyzer {
 
       let regexResult = this._pattern.exec(evidence.value);
       while (regexResult != null) {
-
         if (!regexResult.groups.LITERAL) continue;
         // Computing indices manually since NodeJs 12 does not support d flag on regular expressions
         // TODO Get indices from group by adding d flag in regular expression

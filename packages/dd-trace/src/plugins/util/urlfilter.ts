@@ -29,13 +29,9 @@ const urlFilter = {
     function applyFilter(filter: { (arg0: any): any; (arg0: any): any; test: any; some: any }, uri: string) {
       if (typeof filter === 'function') {
         return filter(uri);
-
       } else if (filter instanceof RegExp) {
-
         return filter.test(uri);
-
       } else if (filter instanceof Array) {
-
         return filter.some((filter: { (arg0: any): any; (arg0: any): any; test: any; some: any }) =>
           applyFilter(filter, uri)
         );

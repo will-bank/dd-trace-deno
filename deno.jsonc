@@ -25,8 +25,9 @@
     "include": ["vendor/", ".deno/", "**/spec/"]
   },
   "compilerOptions": {
-    "strict": false,
-    "emitDecoratorMetadata": true,
+    // "strict": false,
+    "strict": true,
+    // "noExplicitAny": true,
     "noExplicitAny": false
   },
   "tasks": {

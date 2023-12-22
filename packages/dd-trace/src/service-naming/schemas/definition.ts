@@ -49,12 +49,10 @@ class SchemaDefinition {
     }
   }
 
-
   getOpName(type: string | number, kind: string | number, plugin: string | number, opts) {
     const item = this.getSchemaItem(type, kind, plugin);
     return item.opName(opts);
   }
-
 
   getServiceName(type: string | number, kind: string | number, plugin: string | number, opts) {
     const item = this.getSchemaItem(type, kind, plugin);

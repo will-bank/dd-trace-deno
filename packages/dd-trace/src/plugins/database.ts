@@ -20,7 +20,6 @@ class DatabasePlugin extends StoragePlugin {
     return ['db.name'];
   }
 
-
   constructor(...args) {
     super(...args);
     this.serviceTags = {
@@ -36,7 +35,6 @@ class DatabasePlugin extends StoragePlugin {
   }
   encodingServiceTags(serviceTag: string, encodeATag: string, spanConfig: string | number | boolean) {
     if (serviceTag !== spanConfig) {
-
       this.serviceTags[serviceTag] = spanConfig;
 
       this.serviceTags[encodeATag] = encodeURIComponent(spanConfig);
@@ -58,9 +56,7 @@ class DatabasePlugin extends StoragePlugin {
       `ddps='${encodedDdps}',ddpv='${encodedDdpv}'`;
   }
 
-
   injectDbmQuery(query, serviceName: string | number | boolean, isPreparedStatement = false) {
-
     const mode = this.config.dbmPropagationMode;
 
     if (mode === 'disabled') {
@@ -72,7 +68,6 @@ class DatabasePlugin extends StoragePlugin {
     if (isPreparedStatement || mode === 'service') {
       return `/*${servicePropagation}*/ ${query}`;
     } else if (mode === 'full') {
-
       this.activeSpan.setTag('_dd.dbm_trace_injected', 'true');
 
       const traceparent = this.activeSpan._spanContext.toTraceparent();
@@ -81,12 +76,7 @@ class DatabasePlugin extends StoragePlugin {
   }
 
   maybeTruncate(query: string | any[]) {
-
-    const maxLength = typeof this.config.truncate === 'number'
-
-      ? this.config.truncate
-      : 5000; // same as what the agent does
-
+    const maxLength = typeof this.config.truncate === 'number' ? this.config.truncate : 5000; // same as what the agent does
 
     if (this.config.truncate && query && query.length > maxLength) {
       query = `${query.slice(0, maxLength - 3)}...`;

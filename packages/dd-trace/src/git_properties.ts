@@ -18,7 +18,6 @@ function getGitMetadataFromGitProperties(gitPropertiesString: string) {
       parsedUrl = new URL(repositoryUrl);
 
       if (parsedUrl.password) {
-
         parsedUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
       }
     } catch (e) {

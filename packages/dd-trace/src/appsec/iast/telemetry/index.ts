@@ -44,7 +44,6 @@ class Telemetry {
     }
   }
 
-
   onRequestEnd(context: { [x: string]: any }, rootSpan) {
     if (this.isEnabled()) {
       finalizeRequestNamespace(context, rootSpan);

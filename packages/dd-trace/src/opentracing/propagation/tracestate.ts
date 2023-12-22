@@ -6,7 +6,6 @@ function fromString(
   regex: number | RegExp,
   value: { length: any; matchAll: (arg0: any) => any },
 ) {
-
   if (typeof value !== 'string' || !value.length) {
     return new Type();
   }
@@ -21,7 +20,6 @@ function fromString(
 }
 
 function toString(map: this | this, pairSeparator: string, fieldSeparator: string) {
-
   return Array.from(map.entries())
     .reverse()
     .map((pair: any[]) => pair.join(pairSeparator))
@@ -36,9 +34,7 @@ class TraceStateData extends Map {
     this.changed = false;
   }
 
-
   set(...args) {
-
     if (this.has(args[0]) && this.get(args[0]) === args[1]) {
       return;
     }
@@ -46,12 +42,10 @@ class TraceStateData extends Map {
     return super.set(...args);
   }
 
-
   delete(...args) {
     this.changed = true;
     return super.delete(...args);
   }
-
 
   clear(...args) {
     this.changed = true;
@@ -75,15 +69,12 @@ class TraceState extends Map {
   // Delete entries on update to ensure they're moved to the end of the list
 
   set(key, value) {
-
     if (this.has(key)) {
-
       this.delete(key);
     }
 
     return super.set(key, value);
   }
-
 
   forVendor(vendor, handle: (arg0: any) => any) {
     const data = super.get(vendor);
@@ -95,7 +86,6 @@ class TraceState extends Map {
       if (value) {
         this.set(vendor, state.toString());
       } else {
-
         this.delete(vendor);
       }
     }
@@ -104,7 +94,6 @@ class TraceState extends Map {
   }
 
   static fromString(value: { length: any; matchAll: (arg0: any) => any }) {
-
     return fromString(TraceState, traceStateRegex, value);
   }
 

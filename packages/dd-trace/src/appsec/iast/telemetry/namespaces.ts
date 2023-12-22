@@ -49,7 +49,6 @@ function merge(metrics: any[]) {
 
 function getTagsObject(tags: string | any[]) {
   if (tags && tags.length > 0) {
-
     return filterTags(tags);
   }
 }
@@ -60,7 +59,6 @@ class IastNamespace extends Namespace {
   }
 
   reset() {
-
     this.metrics.clear();
 
     this.distributions.clear();

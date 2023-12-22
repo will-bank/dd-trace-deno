@@ -2,7 +2,6 @@ import { storage } from '../../../datadog-core/index.ts';
 import { debugChannel, errorChannel, getChannelLogLevel, infoChannel, warnChannel } from './channels.ts';
 
 const defaultLogger = {
-
   debug: (msg) => console.debug(msg), /* eslint-disable-line no-console */
 
   info: (msg) => console.info(msg), /* eslint-disable-line no-console */
@@ -68,13 +67,11 @@ function toggle(enable: boolean, level) {
 
 function use(newLogger: { debug: any; error: any }) {
   if (newLogger && newLogger.debug instanceof Function && newLogger.error instanceof Function) {
-
     logger = newLogger;
   }
 }
 
 function reset() {
-
   logger = defaultLogger;
   enabled = false;
   logLevel = getChannelLogLevel();

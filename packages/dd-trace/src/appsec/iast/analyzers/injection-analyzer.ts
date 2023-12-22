@@ -2,14 +2,12 @@ import Analyzer from './vulnerability-analyzer.ts';
 import { getRanges, isTainted } from '../taint-tracking/operations.ts';
 
 class InjectionAnalyzer extends Analyzer {
-
   _isVulnerable(value, iastContext: { [x: string]: any }) {
     if (value) {
       return isTainted(iastContext, value);
     }
     return false;
   }
-
 
   _getEvidence(
     value,

@@ -37,7 +37,6 @@ class HstsHeaderMissingAnalyzer extends MissingHeaderAnalyzer {
     if (semicolonIndex > -1) {
       timestampString = headerValue.substring(HEADER_VALID_PREFIX.length + 1, semicolonIndex);
     } else {
-
       timestampString = headerValue.substring(HEADER_VALID_PREFIX.length + 1);
     }
 

@@ -23,7 +23,6 @@ class TaintTrackingPlugin extends SourceIastPlugin {
   onConfigure() {
     this.addSub(
       { channelName: 'datadog:body-parser:read:finish', tag: HTTP_REQUEST_BODY },
-
       ({ req }) => {
         const iastContext = getIastContext(storage.getStore());
         if (iastContext && iastContext['body'] !== req.body) {
@@ -35,13 +34,11 @@ class TaintTrackingPlugin extends SourceIastPlugin {
 
     this.addSub(
       { channelName: 'datadog:qs:parse:finish', tag: HTTP_REQUEST_PARAMETER },
-
       ({ qs }) => this._taintTrackingHandler(HTTP_REQUEST_PARAMETER, qs),
     );
 
     this.addSub(
       { channelName: 'apm:express:middleware:next', tag: HTTP_REQUEST_BODY },
-
       ({ req }) => {
         if (req && req.body && typeof req.body === 'object') {
           const iastContext = getIastContext(storage.getStore());
@@ -55,13 +52,11 @@ class TaintTrackingPlugin extends SourceIastPlugin {
 
     this.addSub(
       { channelName: 'datadog:cookie:parse:finish', tag: [HTTP_REQUEST_COOKIE_VALUE, HTTP_REQUEST_COOKIE_NAME] },
-
       ({ cookies }) => this._cookiesTaintTrackingHandler(cookies),
     );
 
     this.addSub(
       { channelName: 'datadog:express:process_params:start', tag: HTTP_REQUEST_PATH_PARAM },
-
       ({ req }) => {
         if (req && req.params && typeof req.params === 'object') {
           this._taintTrackingHandler(HTTP_REQUEST_PATH_PARAM, req, 'params');
@@ -72,7 +67,6 @@ class TaintTrackingPlugin extends SourceIastPlugin {
     // this is a special case to increment INSTRUMENTED_SOURCE metric for header
     this.addInstrumentedSource('http', [HTTP_REQUEST_HEADER_VALUE, HTTP_REQUEST_HEADER_NAME]);
   }
-
 
   _taintTrackingHandler(
     type,
@@ -87,12 +81,10 @@ class TaintTrackingPlugin extends SourceIastPlugin {
     }
   }
 
-
   _cookiesTaintTrackingHandler(target) {
     const iastContext = getIastContext(storage.getStore());
     taintObject(iastContext, target, HTTP_REQUEST_COOKIE_VALUE, true, HTTP_REQUEST_COOKIE_NAME);
   }
-
 
   taintHeaders(headers, iastContext) {
     this.execSource({
@@ -101,7 +93,6 @@ class TaintTrackingPlugin extends SourceIastPlugin {
       iastContext,
     });
   }
-
 
   taintUrl(req: { url: any }, iastContext) {
     this.execSource({
@@ -112,7 +103,6 @@ class TaintTrackingPlugin extends SourceIastPlugin {
       iastContext,
     });
   }
-
 
   taintRequest(req: { headers: any }, iastContext) {
     this.taintHeaders(req.headers, iastContext);

@@ -29,44 +29,34 @@ class MissingHeaderAnalyzer extends Analyzer {
   }
 
   onConfigure() {
-
     this.addSub({
       channelName: 'datadog:iast:response-end',
       moduleName: 'http',
-
     }, (data) => this.analyze(data));
   }
-
 
   _getLocation() {
     return undefined;
   }
 
-
   _checkOCE(context) {
     return true;
   }
 
-
   _createHashSource(type, evidence, location) {
-
     return `${type}:${this.config.tracerConfig.service}`;
   }
-
 
   _getEvidence({ res }) {
     return { value: res.getHeader(this.headerName) };
   }
 
-
   _isVulnerable({ req, res }, context) {
-
     if (!IGNORED_RESPONSE_STATUS_LIST.includes(res.statusCode) && this._isResponseHtml(res)) {
       return this._isVulnerableFromRequestAndResponse(req, res);
     }
     return false;
   }
-
 
   _isVulnerableFromRequestAndResponse(req, res) {
     return false;

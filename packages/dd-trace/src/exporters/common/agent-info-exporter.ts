@@ -6,17 +6,14 @@ function fetchAgentInfo(url, callback: (arg0: any, arg1: undefined) => any) {
   request('', {
     path: '/info',
     url,
-
   }, (err, res: string) => {
     if (err) {
-
       return callback(err);
     }
     try {
       const response = JSON.parse(res);
       return callback(null, response);
     } catch (e) {
-
       return callback(e);
     }
   });
@@ -56,7 +53,6 @@ class AgentInfoExporter {
     this._export(trace);
   }
 
-
   _export(payload: any[], writer = this._writer, timerKey = '_timer') {
     writer.append(payload);
 
@@ -64,14 +60,11 @@ class AgentInfoExporter {
 
     if (flushInterval === 0) {
       writer.flush();
-
     } else if (flushInterval > 0 && !this[timerKey]) {
-
       this[timerKey] = setTimeout(() => {
         writer.flush();
 
         this[timerKey] = clearTimeout(this[timerKey]);
-
       }, flushInterval);
 
       Deno.unrefTimer(this[timerKey]);

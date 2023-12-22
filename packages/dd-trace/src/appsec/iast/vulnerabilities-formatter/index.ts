@@ -25,7 +25,6 @@ class VulnerabilityFormatter {
     ));
   }
 
-
   getRedactedValueParts(
     type,
     evidence: { ranges: any; value: any },
@@ -60,7 +59,6 @@ class VulnerabilityFormatter {
     return { valueParts };
   }
 
-
   formatEvidence(type, evidence: { ranges: any; value: any }, sourcesIndexes: any[], sources: any[]) {
     if (!evidence.ranges) {
       if (typeof evidence.value === 'undefined') {
@@ -71,7 +69,6 @@ class VulnerabilityFormatter {
     }
 
     return this._redactVulnearbilities
-
       ? this.getRedactedValueParts(type, evidence, sourcesIndexes, sources)
       : this.getUnredactedValueParts(evidence, sourcesIndexes);
   }
@@ -90,11 +87,9 @@ class VulnerabilityFormatter {
       },
     };
     if (vulnerability.location.path) {
-
       formattedVulnerability.location.path = vulnerability.location.path;
     }
     if (vulnerability.location.line) {
-
       formattedVulnerability.location.line = vulnerability.location.line;
     }
     return formattedVulnerability;
@@ -108,7 +103,6 @@ class VulnerabilityFormatter {
 
       const sourcesIndexes = [];
       vulnerabilitySources.forEach((source: { origin: any; name: any; value: any }) => {
-
         let sourceIndex = sources.findIndex(
           (existingSource: { origin: any; name: any; value: any }) =>
             existingSource.origin === source.origin &&
@@ -121,7 +115,6 @@ class VulnerabilityFormatter {
         }
         sourcesIndexes.push(sourceIndex);
       });
-
 
       return this.formatVulnerability(vulnerability, sourcesIndexes, sources);
     });

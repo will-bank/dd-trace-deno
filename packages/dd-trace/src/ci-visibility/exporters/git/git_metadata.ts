@@ -110,7 +110,7 @@ function uploadPackFile({ url, isEvpProxy, packFileToUpload, repositoryUrl, head
   form.append(
     'pushedSha',
     new Blob([pushedSha], { type: 'application/json' }),
-    );
+  );
 
   try {
     const packFileContent = Deno.readFileSync(packFileToUpload);
@@ -120,7 +120,7 @@ function uploadPackFile({ url, isEvpProxy, packFileToUpload, repositoryUrl, head
     form.append(
       'packfile',
       new Blob([packFileContent], { type: 'application/octet-stream' }),
-      filename
+      filename,
     );
   } catch (e) {
     callback(new Error(`Could not read "${packFileToUpload}"`));
@@ -139,7 +139,6 @@ function uploadPackFile({ url, isEvpProxy, packFileToUpload, repositoryUrl, head
     options.headers['X-Datadog-EVP-Subdomain'] = 'api';
     delete options.headers['dd-api-key'];
   }
-
 
   request(form, options, (err: { message: any }, _, statusCode) => {
     if (err) {
@@ -180,7 +179,6 @@ function sendGitMetadata(url, isEvpProxy, configRepositoryUrl, callback: (arg0: 
       const [headCommit] = latestCommits;
       const commitsToInclude = latestCommits.filter((commit) => !commitsToExclude.includes(commit));
       log.debug(`There are ${commitsToInclude.length} commits to include.`);
-
 
       const commitsToUpload = getCommitsToUpload(commitsToExclude, commitsToInclude);
 

@@ -9,9 +9,7 @@ class TracingPlugin extends Plugin {
   operation: any;
 
   constructor(...args) {
-
     super(...args);
-
 
     this.component = this.constructor.component || this.constructor.id;
 
@@ -19,7 +17,6 @@ class TracingPlugin extends Plugin {
 
     this.addTraceSubs();
   }
-
 
   get activeSpan() {
     const store = storage.getStore();
@@ -29,7 +26,6 @@ class TracingPlugin extends Plugin {
 
   serviceName(opts = {}) {
     const {
-
       type = this.constructor.type,
 
       id = this.constructor.id,
@@ -42,7 +38,6 @@ class TracingPlugin extends Plugin {
 
   operationName(opts = {}) {
     const {
-
       type = this.constructor.type,
 
       id = this.constructor.id,
@@ -54,7 +49,6 @@ class TracingPlugin extends Plugin {
   }
 
   configure(config: { hooks: any }) {
-
     return super.configure({
       ...config,
       hooks: {
@@ -80,31 +74,25 @@ class TracingPlugin extends Plugin {
     for (const event of events) {
       const bindName = `bind${event.charAt(0).toUpperCase()}${event.slice(1)}`;
 
-
       if (this[event]) {
         this.addTraceSub(event, (message) => {
-
           this[event](message);
         });
       }
 
-
       if (this[bindName]) {
-
         this.addTraceBind(event, (message) => this[bindName](message));
       }
     }
   }
 
   addTraceSub(eventName: string, handler: (message: any) => void) {
-
     const prefix = this.constructor.prefix || `apm:${this.component}:${this.operation}`;
 
     this.addSub(`${prefix}:${eventName}`, handler);
   }
 
   addTraceBind(eventName: string, transform: (message: any) => any) {
-
     const prefix = this.constructor.prefix || `apm:${this.component}:${this.operation}`;
 
     this.addBind(`${prefix}:${eventName}`, transform);
@@ -118,14 +106,12 @@ class TracingPlugin extends Plugin {
     }
   }
 
-
   startSpan(name, { childOf, kind, meta, metrics, service, resource, type } = {}, enter = true) {
     const store = storage.getStore();
 
     if (store && childOf === undefined) {
       childOf = store.span;
     }
-
 
     const span = this.tracer.startSpan(name, {
       childOf,
@@ -141,7 +127,6 @@ class TracingPlugin extends Plugin {
       },
       integrationName: type,
     });
-
 
     analyticsSampler.sample(span, this.config.measured);
 

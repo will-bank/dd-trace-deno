@@ -3,7 +3,6 @@ import log from '../../log/index.ts';
 
 function setUserTags(user: object, rootSpan: { setTag: (arg0: string, arg1: string) => void }) {
   for (const k of Object.keys(user)) {
-
     rootSpan.setTag(`usr.${k}`, '' + user[k]);
   }
 }

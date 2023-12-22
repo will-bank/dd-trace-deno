@@ -41,7 +41,6 @@ function getFilteredCsiFn(
   filter: { (res: any, fn: any, target: any): any; (arg0: any, arg1: any, arg2: any): any },
   getContext: () => any,
 ) {
-
   return function csiCall(res, fn, target, ...rest: any[]) {
     try {
       if (filter(res, fn, target)) return res;
@@ -49,7 +48,6 @@ function getFilteredCsiFn(
       const context = getContext();
       const transactionId = getTransactionId(context);
       if (transactionId) {
-
         return cb(transactionId, res, target, ...rest);
       }
     } catch (e) {
@@ -61,7 +59,6 @@ function getFilteredCsiFn(
 }
 
 function notString() {
-
   return Array.prototype.some.call(arguments, (p) => typeof p !== 'string');
 }
 
@@ -79,14 +76,12 @@ function getCsiFn(
 ) {
   let filter;
   if (!protos || protos.length === 0) {
-
     filter = (res, fn, target) => notString(res, target);
   } else if (protos.length === 1) {
     const protoFn = protos[0];
 
     filter = (res, fn: string, target) => notString(res, target) || fn !== protoFn;
   } else {
-
     filter = (res, fn, target) => notString(res, target) || !isValidCsiMethod(fn, protos);
   }
   return getFilteredCsiFn(cb, filter, getContext);
@@ -95,13 +90,11 @@ function getCsiFn(
 function csiMethodsDefaults(names: any[], excluded: string | any[], getContext) {
   const impl = {};
   names.forEach((name: string | number) => {
-
     if (excluded.indexOf(name) !== -1) return;
 
     impl[name] = getCsiFn(
       (transactionId, res, target, ...rest) => TaintedUtils[name](transactionId, res, target, ...rest),
       getContext,
-
       String.prototype[name],
     );
   });
@@ -110,10 +103,8 @@ function csiMethodsDefaults(names: any[], excluded: string | any[], getContext) 
 
 function csiMethodsOverrides(getContext: () => any) {
   return {
-
     plusOperator: function (res, op1, op2) {
       try {
-
         if (notString(res) || (notString(op1) && notString(op2))) return res;
         const iastContext = getContext();
         const transactionId = getTransactionId(iastContext);
@@ -130,9 +121,7 @@ function csiMethodsOverrides(getContext: () => any) {
     trim: getCsiFn(
       (transactionId, res, target) => TaintedUtils.trim(transactionId, res, target),
       getContext,
-
       String.prototype.trim,
-
       String.prototype.trimStart,
     ),
   };

@@ -18,9 +18,7 @@ class SpanStatsExporter {
     this.writer = new Writer(this.url);
   }
 
-
   export(payload) {
-
     this.writer.append(payload);
 
     this.writer.flush();

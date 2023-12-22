@@ -32,11 +32,9 @@ class IastMetric {
     return getNamespaceFromContext(context) || globalNamespace;
   }
 
-
   getTag(tagValue) {
     return tagValue ? { [this.tagKey]: tagValue } : undefined;
   }
-
 
   addValue(value: number, tagValue, context: { [x: string]: any }) {
     this.getNamespace(context)

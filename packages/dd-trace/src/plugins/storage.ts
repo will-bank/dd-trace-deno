@@ -7,18 +7,14 @@ class StoragePlugin extends ClientPlugin {
     return 'storage';
   }
 
-
   constructor(...args) {
     super(...args);
-
 
     this.system = this.constructor.system || this.component;
   }
 
-
   startSpan(name, options: { service: string }) {
     if (!options.service && this.system) {
-
       options.service = `${this.tracer._service}-${this.system}`;
     }
 

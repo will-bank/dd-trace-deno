@@ -16,7 +16,6 @@ import { normalizeRef } from './ci.ts';
 
 function removeEmptyValues(tags: object) {
   return Object.keys(tags).reduce((filteredTags, tag) => {
-
     if (!tags[tag]) {
       return filteredTags;
     }
@@ -30,7 +29,6 @@ function removeEmptyValues(tags: object) {
 
 function filterSensitiveInfoFromRepository(repositoryUrl: string | URL) {
   try {
-
     if (repositoryUrl.startsWith('git@')) {
       return repositoryUrl;
     }

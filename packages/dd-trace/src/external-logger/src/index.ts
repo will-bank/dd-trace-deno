@@ -16,7 +16,6 @@ export class ExternalLogger {
   timer: any;
   // Note: these attribute names match the corresponding entry in the JSON payload.
   constructor({
-
     ddsource,
     hostname,
     service,
@@ -44,7 +43,6 @@ export class ExternalLogger {
     };
     this.timer = setInterval(() => {
       this.flush();
-
     }, this.interval);
 
     Deno.unrefTimer(this.timer);
@@ -109,7 +107,6 @@ export class ExternalLogger {
     let encodedLogs;
 
     if (!this.queue.length) {
-
       queueMicrotask(() => cb());
       return;
     }
@@ -145,7 +142,6 @@ export class ExternalLogger {
       tracerLogger.info(`statusCode: ${res.status}`);
 
       if (res.status >= 400) {
-
         const error = new Error(`failed to send ${numLogs} logs, received response code ${res.statusCode}`);
         tracerLogger.error(error.message);
 

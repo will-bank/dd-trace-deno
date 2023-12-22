@@ -14,33 +14,27 @@ class SqlInjectionAnalyzer extends InjectionAnalyzer {
   }
 
   onConfigure() {
-
     this.addSub('apm:mysql:query:start', ({ sql }) => this.analyze(sql, 'MYSQL'));
 
     this.addSub('apm:mysql2:query:start', ({ sql }) => this.analyze(sql, 'MYSQL'));
 
     this.addSub('apm:pg:query:start', ({ query }) => this.analyze(query.text, 'POSTGRES'));
 
-
     this.addSub(
       'datadog:sequelize:query:start',
-
       ({ sql, dialect }) => this.getStoreAndAnalyze(sql, dialect.toUpperCase()),
     );
 
     this.addSub('datadog:sequelize:query:finish', () => this.returnToParentStore());
 
-
     this.addSub('datadog:pg:pool:query:start', ({ query }) => this.getStoreAndAnalyze(query.text, 'POSTGRES'));
 
     this.addSub('datadog:pg:pool:query:finish', () => this.returnToParentStore());
-
 
     this.addSub('datadog:mysql:pool:query:start', ({ sql }) => this.getStoreAndAnalyze(sql, 'MYSQL'));
 
     this.addSub('datadog:mysql:pool:query:finish', () => this.returnToParentStore());
   }
-
 
   getStoreAndAnalyze(query, dialect: string) {
     const parentStore = storage.getStore();
@@ -58,7 +52,6 @@ class SqlInjectionAnalyzer extends InjectionAnalyzer {
     }
   }
 
-
   _getEvidence(
     value,
     iastContext: { rootSpan: { context: () => { (): any; new (): any; toSpanId: { (): any; new (): any } } } },
@@ -67,7 +60,6 @@ class SqlInjectionAnalyzer extends InjectionAnalyzer {
     const ranges = getRanges(iastContext, value);
     return { value, ranges, dialect };
   }
-
 
   analyze(value, dialect: string, store = storage.getStore()) {
     if (!(store && store.sqlAnalyzed)) {
@@ -78,20 +70,17 @@ class SqlInjectionAnalyzer extends InjectionAnalyzer {
     }
   }
 
-
   _reportIfVulnerable(
     value,
     context: { rootSpan: { context: () => { (): any; new (): any; toSpanId: { (): any; new (): any } } } },
     dialect: string,
   ) {
-
     if (this._isVulnerable(value, context) && this._checkOCE(context)) {
       this._report(value, context, dialect);
       return true;
     }
     return false;
   }
-
 
   _report(
     value,

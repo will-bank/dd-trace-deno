@@ -13,7 +13,6 @@ function getTestConfigurationTags(tags: object) {
     return {};
   }
   return Object.keys(tags).reduce((acc, key) => {
-
     if (key.startsWith('test.configuration.')) {
       const [, configKey] = key.split('test.configuration.');
 
@@ -55,7 +54,7 @@ class CiVisibilityExporter extends AgentInfoExporter {
 
     const gitUploadTimeoutId = setTimeout(() => {
       this._resolveGit(new Error('Timeout while uploading git metadata'));
-    }, GIT_UPLOAD_TIMEOUT)
+    }, GIT_UPLOAD_TIMEOUT);
 
     Deno.unrefTimer(gitUploadTimeoutId);
 
@@ -71,7 +70,6 @@ class CiVisibilityExporter extends AgentInfoExporter {
         resolve(err);
       };
     });
-
 
     this._canUseCiVisProtocolPromise = new Promise((resolve: (arg0: any) => void) => {
       this._resolveCanUseCiVisProtocol = (canUseCiVisProtocol) => {
@@ -93,7 +91,6 @@ class CiVisibilityExporter extends AgentInfoExporter {
   }
 
   shouldRequestSkippableSuites() {
-
     return !!(this._config.isIntelligentTestRunnerEnabled &&
       this._canUseCiVisProtocol &&
       this._itrConfig &&
@@ -101,7 +98,6 @@ class CiVisibilityExporter extends AgentInfoExporter {
   }
 
   shouldRequestItrConfiguration() {
-
     return this._config.isIntelligentTestRunnerEnabled;
   }
 
@@ -182,9 +178,7 @@ class CiVisibilityExporter extends AgentInfoExporter {
     });
   }
 
-
   sendGitMetadata(repositoryUrl) {
-
     if (!this._config.isGitUploadEnabled) {
       return;
     }
@@ -209,7 +203,6 @@ class CiVisibilityExporter extends AgentInfoExporter {
     // Until it's initialized, we just store the traces as is
 
     if (!this._isInitialized) {
-
       this._traceBuffer.push(trace);
       return;
     }
@@ -230,20 +223,16 @@ class CiVisibilityExporter extends AgentInfoExporter {
       return;
     }
 
-
     this._export(formattedCoverage, this._coverageWriter, '_coverageTimer');
   }
 
   flush(done = () => {}) {
-
     if (!this._isInitialized) {
       return done();
     }
 
     this._writer.flush(() => {
-
       if (this._coverageWriter) {
-
         this._coverageWriter.flush(done);
       } else {
         done();

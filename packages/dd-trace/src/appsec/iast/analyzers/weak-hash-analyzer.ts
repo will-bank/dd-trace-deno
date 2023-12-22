@@ -41,7 +41,6 @@ class WeakHashAnalyzer extends Analyzer {
   }
 
   onConfigure() {
-
     this.addSub('datadog:crypto:hashing:start', ({ algorithm }) => this.analyze(algorithm));
   }
 

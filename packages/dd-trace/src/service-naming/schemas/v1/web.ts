@@ -23,7 +23,6 @@ const web = {
       serviceName: httpPluginClientService,
     },
     aws: {
-
       opName: ({ awsService }) => `aws.${awsService}.request`,
       serviceName: identityService,
     },

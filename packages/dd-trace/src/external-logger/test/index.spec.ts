@@ -5,18 +5,14 @@ import nock from 'npm:nock';
 
 import tracerLogger from '../../log/index.ts';
 
-
 describe('External Logger', () => {
-
   let externalLogger;
 
   let interceptor;
 
   let errorLog;
 
-
   beforeEach(() => {
-
     errorLog = sinon.spy(tracerLogger, 'error');
 
     const { ExternalLogger } = proxyquire('../src', {
@@ -35,23 +31,18 @@ describe('External Logger', () => {
     });
   });
 
-
   afterEach(() => {
-
     interceptor.done();
 
     errorLog.restore();
   });
 
-
   it('should properly encode the log message', (done: (arg0: any) => void) => {
-
     let request;
     const currentTime = Date.now();
 
     interceptor = nock('https://http-intake.logs.datadoghq.com:443')
       .post('/api/v2/logs')
-
       .reply((_uri, req, cb: (arg0: any, arg1: (string | number | { 'Content-Type': string })[]) => void) => {
         request = req;
         cb(null, [202, '{}', { 'Content-Type': 'application/json' }]);
@@ -80,10 +71,8 @@ describe('External Logger', () => {
       tags,
     );
 
-
     externalLogger.flush((err) => {
       try {
-
         expect(request[0]).to.have.property('message', 'oh no, something is up');
 
         expect(request[0]).to.have.property('custom', 'field');
@@ -112,31 +101,25 @@ describe('External Logger', () => {
     });
   });
 
-
   it('should empty the log queue when calling flush', (done: (arg0: any) => void) => {
     interceptor = nock('https://http-intake.logs.datadoghq.com:443')
       .post('/api/v2/logs')
       .reply(202, {});
 
-
     externalLogger.enqueue({});
 
     expect(externalLogger.queue.length).to.equal(1);
 
-
     externalLogger.flush((err) => {
-
       expect(externalLogger.queue.length).to.equal(0);
       done(err);
     });
   });
 
-
   it('tracer logger should handle error response codes from Logs API', (done: () => void) => {
     interceptor = nock('https://http-intake.logs.datadoghq.com:443')
       .post('/api/v2/logs')
       .reply(400, {});
-
 
     externalLogger.enqueue({});
 
@@ -150,12 +133,10 @@ describe('External Logger', () => {
     });
   });
 
-
   it('tracer logger should handle simulated network error', (done: () => void) => {
     interceptor = nock('https://http-intake.logs.datadoghq.com:443')
       .post('/api/v2/logs')
       .replyWithError('missing API key');
-
 
     externalLogger.enqueue({});
 
@@ -169,17 +150,13 @@ describe('External Logger', () => {
     });
   });
 
-
   it('causes a flush when exceeding log queue limit', (done: () => void) => {
-
     const flusher = sinon.stub(externalLogger, 'flush');
 
     for (let i = 0; i < 10; i++) {
-
       externalLogger.enqueue({});
     }
     expect(flusher).to.not.have.been.called;
-
 
     externalLogger.enqueue({});
     expect(flusher).to.have.been.called;

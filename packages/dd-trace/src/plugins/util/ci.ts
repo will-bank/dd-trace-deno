@@ -42,7 +42,6 @@ function parseEmailAndName(emailAndName: string) {
 
 function removeEmptyValues(tags: object) {
   return Object.keys(tags).reduce((filteredTags, tag) => {
-
     if (!tags[tag]) {
       return filteredTags;
     }
@@ -72,7 +71,6 @@ function normalizeRef(ref: string) {
 }
 
 function filterSensitiveInfoFromRepository(repositoryUrl: string | URL) {
-
   if (repositoryUrl.startsWith('git@')) {
     return repositoryUrl;
   }
@@ -146,7 +144,6 @@ export function getCIMetadata() {
     const isTag = JENKINS_GIT_BRANCH && JENKINS_GIT_BRANCH.includes('tags/');
     const refKey = isTag ? GIT_TAG : GIT_BRANCH;
     const ref = normalizeRef(JENKINS_GIT_BRANCH);
-
 
     tags[refKey] = ref;
 
@@ -480,13 +477,12 @@ export function getCIMetadata() {
       BUILDKITE_AGENT_ID,
     } = env;
 
-    const extraTags = Object.keys(env).filter((envVar) =>
-
-      envVar.startsWith('BUILDKITE_AGENT_META_DATA_')
-    ).map((metadataKey) => {
-      const key = metadataKey.replace('BUILDKITE_AGENT_META_DATA_', '').toLowerCase();
-      return `${key}:${env[metadataKey]}`;
-    });
+    const extraTags = Object.keys(env).filter((envVar) => envVar.startsWith('BUILDKITE_AGENT_META_DATA_')).map(
+      (metadataKey) => {
+        const key = metadataKey.replace('BUILDKITE_AGENT_META_DATA_', '').toLowerCase();
+        return `${key}:${env[metadataKey]}`;
+      },
+    );
 
     tags = {
       [CI_PROVIDER_NAME]: 'buildkite',
@@ -607,7 +603,6 @@ export function getCIMetadata() {
     const isTag = CF_BRANCH && CF_BRANCH.includes('tags/');
     const refKey = isTag ? GIT_TAG : GIT_BRANCH;
     const ref = normalizeRef(CF_BRANCH);
-
 
     tags[refKey] = ref;
   }

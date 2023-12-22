@@ -4,7 +4,6 @@ class JSONEncoder {
     this.payloads = [];
   }
 
-
   encode(payload) {
     this.payloads.push(payload);
   }

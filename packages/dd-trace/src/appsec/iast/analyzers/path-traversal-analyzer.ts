@@ -28,7 +28,6 @@ class PathTraversalAnalyzer extends InjectionAnalyzer {
   }
 
   onConfigure() {
-
     this.addSub(
       'apm:fs:operation:start',
       (
@@ -45,7 +44,6 @@ class PathTraversalAnalyzer extends InjectionAnalyzer {
           target: any;
         },
       ) => {
-
         if (ignoredOperations.includes(obj.operation)) return;
 
         const pathArguments: any[] = [];
@@ -102,9 +100,7 @@ class PathTraversalAnalyzer extends InjectionAnalyzer {
 
     if (value && value.constructor === Array) {
       for (const val of value) {
-
         if (this._isVulnerable(val, iastContext) && this._checkOCE(iastContext)) {
-
           this._report(val, iastContext);
           // no support several evidences in the same vulnerability, just report the 1st one
           break;

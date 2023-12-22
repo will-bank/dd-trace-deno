@@ -23,7 +23,6 @@ function getGetOriginalPathAndLineFromSourceMapFunction(
   getOriginalPathAndLineFromSourceMap: (arg0: any, arg1: any, arg2: any) => any,
 ) {
   if (chainSourceMap) {
-
     return function (path, line, column) {
       // if --enable-source-maps is present stacktraces of the rewritten files contain the original path, file and
       // column because the sourcemap chaining is done during the rewriting process so we can skip it
@@ -39,7 +38,6 @@ function getGetOriginalPathAndLineFromSourceMapFunction(
 }
 
 function getRewriter(telemetryVerbosity) {
-
   if (!rewriter) {
     try {
       const iastRewriter = await import('@datadog/native-iast-rewriter');
@@ -67,7 +65,6 @@ function getRewriter(telemetryVerbosity) {
 
 let originalPrepareStackTrace = Error.prepareStackTrace;
 function getPrepareStackTraceAccessor() {
-
   let actual = getPrepareStackTrace(originalPrepareStackTrace);
   return {
     configurable: true,
@@ -76,7 +73,6 @@ function getPrepareStackTraceAccessor() {
     },
 
     set(value) {
-
       actual = getPrepareStackTrace(value);
       originalPrepareStackTrace = value;
     },
@@ -84,7 +80,6 @@ function getPrepareStackTraceAccessor() {
 }
 
 function getCompileMethodFn(compileMethod: { apply: (arg0: any, arg1: any[]) => any }) {
-
   const rewriteFn = getRewriteFunction(rewriter);
 
   return function (content, filename) {
@@ -107,10 +102,8 @@ function enableRewriter(telemetryVerbosity) {
   try {
     const rewriter = getRewriter(telemetryVerbosity);
     if (rewriter) {
-
       const pstDescriptor = Object.getOwnPropertyDescriptor(global.Error, 'prepareStackTrace');
       if (!pstDescriptor || pstDescriptor.configurable) {
-
         Object.defineProperty(global.Error, 'prepareStackTrace', getPrepareStackTraceAccessor());
       }
       shimmer.wrap(

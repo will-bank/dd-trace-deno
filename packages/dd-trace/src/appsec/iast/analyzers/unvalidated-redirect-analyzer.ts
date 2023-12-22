@@ -16,10 +16,8 @@ class UnvalidatedRedirectAnalyzer extends InjectionAnalyzer {
   }
 
   onConfigure() {
-
     this.addSub('datadog:http:server:response:set-header:finish', ({ name, value }) => this.analyze(name, value));
   }
-
 
   analyze(name: string, value) {
     if (!this.isLocationHeader(name) || typeof value !== 'string') return;
@@ -30,7 +28,6 @@ class UnvalidatedRedirectAnalyzer extends InjectionAnalyzer {
   isLocationHeader(name: string) {
     return name && name.trim().toLowerCase() === 'location';
   }
-
 
   _isVulnerable(
     value,

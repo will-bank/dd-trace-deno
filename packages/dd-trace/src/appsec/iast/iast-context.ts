@@ -41,7 +41,6 @@ function cleanIastContext(store: { [x: string]: any }, context: { [x: string]: a
     context[IAST_CONTEXT_KEY] = null;
   }
   if (iastContext) {
-
     Object.keys(iastContext).forEach((key) => delete iastContext[key]);
     return true;
   }

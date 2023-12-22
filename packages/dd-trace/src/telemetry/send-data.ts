@@ -14,7 +14,6 @@ function getHeaders(
   };
   const debug = config.telemetry && config.telemetry.debug;
   if (debug) {
-
     headers['dd-telemetry-debug-enabled'] = 'true';
   }
   return headers;

@@ -24,7 +24,6 @@ class SensitiveHandler {
     this._namePattern = new RegExp(DEFAULT_IAST_REDACTION_NAME_PATTERN, 'gmi');
     this._valuePattern = new RegExp(DEFAULT_IAST_REDACTION_VALUE_PATTERN, 'gmi');
 
-
     this._sensitiveAnalyzers = new Map();
     this._sensitiveAnalyzers.set(vulnerabilities.COMMAND_INJECTION, new CommandSensitiveAnalyzer());
     this._sensitiveAnalyzers.set(vulnerabilities.LDAP_INJECTION, new LdapSensitiveAnalyzer());
@@ -48,7 +47,6 @@ class SensitiveHandler {
     return source != null && (this.isSensibleName(source.name) || this.isSensibleValue(source.value));
   }
 
-
   scrubEvidence(
     vulnerabilityType,
     evidence: { value: any; ranges: any },
@@ -69,7 +67,6 @@ class SensitiveHandler {
     sourcesIndexes: any[],
     sources: { [x: string]: any },
   ) {
-
     const valueParts = [];
     const redactedSources: any[] = [];
     const redactedSourcesContext = [];
@@ -85,7 +82,6 @@ class SensitiveHandler {
 
     for (let i = 0; i < value.length; i++) {
       if (nextTainted != null && nextTainted.start === i) {
-
         this.writeValuePart(valueParts, value.substring(start, i), sourceIndex);
 
         sourceIndex = sourcesIndexes[nextTaintedIndex];
@@ -94,7 +90,6 @@ class SensitiveHandler {
           const redactionStart = nextSensitive.start - nextTainted.start;
           const redactionEnd = nextSensitive.end - nextTainted.start;
           if (redactionStart === redactionEnd) {
-
             this.writeRedactedValuePart(valueParts, 0);
           } else {
             this.redactSource(
@@ -137,7 +132,6 @@ class SensitiveHandler {
         if (redactedSources.indexOf(sourceIndex) > -1) {
           const partValue = value.substring(i, i + (nextTainted.end - nextTainted.start));
           this.writeRedactedValuePart(
-
             valueParts,
             partValue.length,
             sourceIndex,
@@ -159,7 +153,6 @@ class SensitiveHandler {
         nextTaintedIndex++;
         sourceIndex = null;
       } else if (nextSensitive != null && nextSensitive.start === i) {
-
         this.writeValuePart(valueParts, value.substring(start, i), sourceIndex);
         if (nextTainted != null && intersects(nextSensitive, nextTainted)) {
           sourceIndex = sourcesIndexes[nextTaintedIndex];
@@ -195,10 +188,8 @@ class SensitiveHandler {
     }
 
     if (start < value.length) {
-
       this.writeValuePart(valueParts, value.substring(start));
     }
-
 
     return { redactedValueParts: valueParts, redactedSources };
   }
@@ -219,9 +210,7 @@ class SensitiveHandler {
         sources[sourceIndex].redacted = true;
       }
 
-
       if (!redactedSourcesContext[sourceIndex]) {
-
         redactedSourcesContext[sourceIndex] = [];
       }
 
@@ -231,7 +220,6 @@ class SensitiveHandler {
       });
     }
   }
-
 
   writeValuePart(valueParts: any[], value: string | any[], source) {
     if (value.length > 0) {
@@ -246,7 +234,6 @@ class SensitiveHandler {
   writeRedactedValuePart(
     valueParts: any[],
     length: number,
-
     sourceIndex,
     partValue: undefined,
     source: { value: { includes: (arg0: any) => any; indexOf: (arg0: any) => any }; pattern: any },
@@ -254,10 +241,7 @@ class SensitiveHandler {
     isSensibleSource: boolean,
   ) {
     if (sourceIndex != null) {
-      const placeholder = source.value.includes(partValue)
-        ? source.pattern
-
-        : '*'.repeat(length);
+      const placeholder = source.value.includes(partValue) ? source.pattern : '*'.repeat(length);
 
       if (isSensibleSource) {
         valueParts.push({ redacted: true, source: sourceIndex, pattern: placeholder });
@@ -285,14 +269,14 @@ class SensitiveHandler {
               value: _value.substring(0, _sourceRedactionContext.start - offset),
             });
 
-
             _value = _value.substring(_sourceRedactionContext.start - offset);
             offset = _sourceRedactionContext.start;
           }
 
-          const sensitive =
-
-            _value.substring(_sourceRedactionContext.start - offset, _sourceRedactionContext.end - offset);
+          const sensitive = _value.substring(
+            _sourceRedactionContext.start - offset,
+            _sourceRedactionContext.end - offset,
+          );
           const indexOfPartValueInPattern = source.value.indexOf(sensitive);
 
           const pattern = indexOfPartValueInPattern > -1
@@ -305,11 +289,9 @@ class SensitiveHandler {
             pattern,
           });
 
-
           _value = _value.substring(pattern.length);
           offset += pattern.length;
         });
-
 
         if (_value.length) {
           valueParts.push({

@@ -1,7 +1,6 @@
 import OutboundPlugin from './outbound.ts';
 
 class ClientPlugin extends OutboundPlugin {
-
   static get operation() {
     return 'request';
   }

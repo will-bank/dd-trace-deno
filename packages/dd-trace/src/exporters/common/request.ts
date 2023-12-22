@@ -3,7 +3,7 @@
 
 import { Readable } from 'node:stream';
 import http from 'node:http';
-import { parse as parseURL, format as formatURL } from 'node:url';
+import { format as formatURL, parse as parseURL } from 'node:url';
 import docker from './docker.ts';
 import { httpAgent, httpsAgent } from './agents.ts';
 import { storage } from '../../../../datadog-core/index.ts';
@@ -16,7 +16,6 @@ let activeRequests = 0;
 
 // TODO: Replace with `url.urlToHttpOptions` when supported by all versions
 function urlToOptions(url: URL) {
-
   const agent = url.agent || http.globalAgent;
   const options = new URL(url);
   options.protocol ||= agent.protocol;
@@ -30,7 +29,6 @@ function urlToOptions(url: URL) {
 }
 
 function fromUrlString(urlString: string | URL) {
-
   const url = typeof urlToHttpOptions === 'function' ? urlToOptions(new URL(urlString)) : parseURL(urlString);
 
   // Add the 'hostname' back if we're using named pipes
@@ -98,15 +96,16 @@ function request(
     const agent = options.agent || http.globalAgent;
     return options.protocol || agent.protocol;
   };
-  const getFullUrl = () => new URL(
-    formatURL({
-      protocol: getProtocol(),
-      hostname: options.hostname || 'localhost',
-      port: options.port,
-      pathname: options.path || options.pathname,
-    }),
-    options.url,
-  );
+  const getFullUrl = () =>
+    new URL(
+      formatURL({
+        protocol: getProtocol(),
+        hostname: options.hostname || 'localhost',
+        port: options.port,
+        pathname: options.path || options.pathname,
+      }),
+      options.url,
+    );
 
   const onResponse = async (response: Response) => {
     const responseData = await response.text();

@@ -1,7 +1,6 @@
 import InboundPlugin from './inbound.ts';
 
 class ConsumerPlugin extends InboundPlugin {
-
   static get operation() {
     return 'receive';
   }
@@ -16,11 +15,9 @@ class ConsumerPlugin extends InboundPlugin {
 
   startSpan(options: { service: any; kind: any }) {
     if (!options.service) {
-
       options.service = this.config.service || this.serviceName();
     }
     if (!options.kind) {
-
       options.kind = this.constructor.kind;
     }
 

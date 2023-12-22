@@ -50,13 +50,9 @@ function extractIp(config: { clientIpHeader: string | number }, req: { headers: 
     for (let i = 0; i < ipHeaderList.length; i++) {
       const firstIp = findFirstIp(headers[ipHeaderList[i]]);
 
-
       if (firstIp.public) {
-
         return firstIp.public;
-
       } else if (!firstPrivateIp && firstIp.private) {
-
         firstPrivateIp = firstIp.private;
       }
     }

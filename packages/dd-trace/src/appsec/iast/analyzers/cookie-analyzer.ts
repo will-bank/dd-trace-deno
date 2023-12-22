@@ -12,25 +12,20 @@ class CookieAnalyzer extends Analyzer {
   }
 
   onConfigure() {
-
     this.addSub(
       { channelName: 'datadog:iast:set-cookie', moduleName: 'http' },
-
       (cookieInfo) => this.analyze(cookieInfo),
     );
   }
-
 
   _isVulnerable({ cookieProperties, cookieValue }) {
     return cookieValue && !(cookieProperties && cookieProperties
       .map((x: string) => x.toLowerCase().trim()).includes(this.propertyToBeSafe));
   }
 
-
   _getEvidence({ cookieName }) {
     return { value: cookieName };
   }
-
 
   _createHashSource(type, evidence: { value: any }, location) {
     return `${type}:${evidence.value}`;

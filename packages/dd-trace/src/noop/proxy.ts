@@ -1,7 +1,7 @@
 import NoopTracer from './tracer.ts';
 import NoopAppsecSdk from '../appsec/sdk/noop.ts';
 import TracerProvider from '../opentelemetry/tracer_provider.ts';
-import Config from "../config.ts";
+import Config from '../config.ts';
 
 const noop = new NoopTracer();
 const noopAppsec = new NoopAppsecSdk();

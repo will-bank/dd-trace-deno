@@ -13,15 +13,12 @@ const COMMON_PEER_SVC_SOURCE_TAGS = [
 
 // TODO: Exit span on finish when AsyncResource instances are removed.
 class OutboundPlugin extends TracingPlugin {
-
   static get peerServicePrecursors() {
     return [];
   }
 
-
   constructor(...args) {
     super(...args);
-
 
     this.addTraceSub('connect', (message: { hostname: any; port: any }) => {
       this.connect(message);
@@ -46,7 +43,6 @@ class OutboundPlugin extends TracingPlugin {
     }
 
     const sourceTags = [
-
       ...this.constructor.peerServicePrecursors,
       ...COMMON_PEER_SVC_SOURCE_TAGS,
     ];
@@ -81,14 +77,12 @@ class OutboundPlugin extends TracingPlugin {
   }
 
   finish(...args: any[]) {
-
     this.tagPeerService(this.activeSpan);
 
     super.finish(...args);
   }
 
   tagPeerService(span: { context: () => { (): any; new (): any; _tags: any }; addTags: (arg0: any) => void }) {
-
     if (this.tracer._computePeerService) {
       const peerData = this.getPeerService(span.context()._tags);
       if (peerData !== undefined) {
@@ -101,9 +95,7 @@ class OutboundPlugin extends TracingPlugin {
     this.addHost(url.hostname, url.port);
   }
 
-
   addHost(hostname, port) {
-
     const span = this.activeSpan;
 
     if (!span) return;

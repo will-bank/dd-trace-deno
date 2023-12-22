@@ -72,7 +72,6 @@ class SqlSensitiveAnalyzer {
 
   extractSensitiveRanges(evidence: { dialect: string | number; value: string }) {
     try {
-
       let pattern = this._patterns[evidence.dialect];
       if (!pattern) {
         pattern = this._patterns['ANSI'];

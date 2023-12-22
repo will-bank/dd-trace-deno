@@ -28,7 +28,6 @@ const integrationCounters = {
 };
 
 function getIntegrationCounter(event: string, integration: string) {
-
   const counters = integrationCounters[event];
 
   if (integration in counters) {
@@ -39,7 +38,6 @@ function getIntegrationCounter(event: string, integration: string) {
     `integration_name:${integration.toLowerCase()}`,
     `otel_enabled:${OTEL_ENABLED}`,
   ]);
-
 
   integrationCounters[event][integration] = counter;
 
@@ -97,7 +95,6 @@ export default class DatadogSpan {
 
     getIntegrationCounter('span_created', this._integrationName).inc();
 
-
     this._spanContext = this._createContext(parent, fields);
     this._spanContext._name = operationName;
     this._spanContext._tags = tags;
@@ -142,12 +139,10 @@ export default class DatadogSpan {
     return this._parentTracer;
   }
 
-
   setOperationName(name) {
     this._spanContext._name = name;
     return this;
   }
-
 
   setBaggageItem(key: string | number, value) {
     this._spanContext._baggageItems[key] = value;
@@ -157,7 +152,6 @@ export default class DatadogSpan {
   getBaggageItem(key: string | number) {
     return this._spanContext._baggageItems[key];
   }
-
 
   setTag(key, value) {
     this._addTags({ [key]: value });
@@ -200,7 +194,6 @@ export default class DatadogSpan {
       unfinishedRegistry.unregister(this);
       finishedRegistry.register(this, this._name);
     }
-
 
     finishTime = parseFloat(finishTime) || this._getTime();
 

@@ -43,7 +43,6 @@ function isValid(logEntry: { level: any; message: any }) {
 const logCollector = {
   add(logEntry: { level: any }) {
     try {
-
       if (!isValid(logEntry)) {
         log.info('IAST log collector discarding invalid log');
         return;
@@ -54,7 +53,6 @@ const logCollector = {
         overflowedCount++;
         return;
       }
-
 
       const hash = createHash(logEntry);
       if (!logs.has(hash)) {
@@ -74,7 +72,6 @@ const logCollector = {
     drained.push(...logs.values());
 
     if (overflowedCount > 0) {
-
       drained.push(newLogEntry(`Omitted ${overflowedCount} entries due to overflowing`, 'ERROR'));
     }
 

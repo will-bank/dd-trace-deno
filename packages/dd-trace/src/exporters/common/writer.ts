@@ -1,7 +1,7 @@
 import { isWritable } from './request.ts';
 import log from '../../log/index.ts';
 import { safeJSONStringify } from './util.ts';
-import { AgentEncoder } from "../../encode/0.4.ts";
+import { AgentEncoder } from '../../encode/0.4.ts';
 
 export default abstract class Writer {
   protected readonly _encoder;
@@ -16,7 +16,6 @@ export default abstract class Writer {
   abstract _sendPayload(data, payload: any, done: () => void);
 
   flush(done = () => {}) {
-
     const count = this._encoder.count();
 
     if (!isWritable()) {
@@ -31,7 +30,6 @@ export default abstract class Writer {
     }
   }
 
-
   append(payload) {
     if (!isWritable()) {
       log.debug(() => `Maximum number of active requests reached. Payload discarded: ${safeJSONStringify(payload)}`);
@@ -42,7 +40,6 @@ export default abstract class Writer {
 
     this._encode(payload);
   }
-
 
   _encode(payload) {
     this._encoder.encode(payload);

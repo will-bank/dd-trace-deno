@@ -12,7 +12,6 @@ function add(
 
   try {
     if (typeof keyValuePairs === 'string') {
-
       const segments = keyValuePairs.split(',');
       for (const segment of segments) {
         const separatorIndex = segment.indexOf(':');
@@ -24,7 +23,6 @@ function add(
         carrier[key.trim()] = value.trim();
       }
     } else {
-
       Object.assign(carrier, keyValuePairs);
     }
   } catch (e) {

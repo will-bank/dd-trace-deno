@@ -4,18 +4,18 @@ import { join } from 'https://deno.land/std@0.204.0/path/join.ts';
 import log from '../../log/index.ts';
 import { sanitizedExec } from './exec.ts';
 import {
-  GIT_COMMIT_SHA,
+  CI_WORKSPACE_PATH,
   GIT_BRANCH,
-  GIT_REPOSITORY_URL,
-  GIT_TAG,
-  GIT_COMMIT_MESSAGE,
-  GIT_COMMIT_COMMITTER_DATE,
-  GIT_COMMIT_COMMITTER_EMAIL,
-  GIT_COMMIT_COMMITTER_NAME,
   GIT_COMMIT_AUTHOR_DATE,
   GIT_COMMIT_AUTHOR_EMAIL,
   GIT_COMMIT_AUTHOR_NAME,
-  CI_WORKSPACE_PATH,
+  GIT_COMMIT_COMMITTER_DATE,
+  GIT_COMMIT_COMMITTER_EMAIL,
+  GIT_COMMIT_COMMITTER_NAME,
+  GIT_COMMIT_MESSAGE,
+  GIT_COMMIT_SHA,
+  GIT_REPOSITORY_URL,
+  GIT_TAG,
 } from './tags.ts';
 
 const GIT_REV_LIST_MAX_BUFFER = 8 * 1024 * 1024; // 8MB
@@ -78,7 +78,6 @@ function getLatestCommits() {
     return execFileSync('git', ['log', '--format=%H', '-n 1000', '--since="1 month ago"'], { stdio: 'pipe' })
       .toString()
       .split('\n')
-
       .filter((commit) => commit);
   } catch (err) {
     log.error(`Get latest commits failed: ${err.message}`);
@@ -105,7 +104,6 @@ function getCommitsToUpload(commitsToExclude: any[], commitsToInclude) {
     )
       .toString()
       .split('\n')
-
       .filter((commit) => commit);
   } catch (err) {
     log.error(`Get commits to upload failed: ${err.message}`);
@@ -138,7 +136,6 @@ function generatePackFilesForCommits(commitsToUpload: any[]) {
         targetPath,
       ],
       { stdio: 'pipe', input: commitsToUpload.join('\n') },
-
     ).toString().split('\n').filter((commit) => commit).map((commit) => `${targetPath}-${commit}.pack`);
   }
 

@@ -32,7 +32,6 @@ class Scope {
     }
   }
 
-
   bind(fn: { apply: (arg0: any, arg1: IArguments) => any }, span) {
     if (typeof fn !== 'function') return fn;
 
@@ -41,7 +40,6 @@ class Scope {
 
     const bound = function () {
       return scope.activate(spanOrActive, () => {
-
         return fn.apply(this, arguments);
       });
     };
@@ -50,7 +48,6 @@ class Scope {
 
     return bound;
   }
-
 
   _spanOrActive(span) {
     return span !== undefined ? span : this.active();

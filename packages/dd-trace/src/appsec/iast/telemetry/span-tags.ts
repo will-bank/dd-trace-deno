@@ -1,7 +1,6 @@
 function addMetricsToSpan(rootSpan: { addTags: (arg0: { [x: string]: any }) => void }, metrics: any[], tagPrefix) {
   if (!rootSpan || !rootSpan.addTags || !metrics) return;
 
-
   const flattenMap = new Map();
   metrics
     .filter((data: { metric: any }) => data && data.metric)

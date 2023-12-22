@@ -23,7 +23,6 @@ class AgentExporter {
     const headers = {};
 
     if (stats.enabled) {
-
       headers['Datadog-Client-Computed-Stats'] = 'yes';
     }
 
@@ -51,29 +50,23 @@ class AgentExporter {
     }
   }
 
-
   export(spans) {
-
     this._writer.append(spans);
 
     const { flushInterval } = this._config;
 
     if (flushInterval === 0) {
-
       this._writer.flush();
     } else if (flushInterval > 0 && !this._timer) {
       this._timer = setTimeout(() => {
-
         this._writer.flush();
         this._timer = clearTimeout(this._timer);
-
       }, flushInterval);
       Deno.unrefTimer(this._timer);
     }
   }
 
   flush(done = () => {}) {
-
     this._writer.flush(done);
   }
 }

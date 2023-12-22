@@ -42,14 +42,11 @@ export default class CiPlugin extends Plugin {
   };
 
   constructor(...args) {
-
     super(...args);
 
     this.rootDir = Deno.cwd(); // fallback in case :session:start events are not emitted
 
-
     this.addSub(`ci:${this.constructor.id}:itr-configuration`, ({ onDone }) => {
-
       if (!this.tracer._exporter || !this.tracer._exporter.getItrConfiguration) {
         return onDone({ err: new Error('CI Visibility was not initialized correctly') });
       }
@@ -64,9 +61,7 @@ export default class CiPlugin extends Plugin {
       });
     });
 
-
     this.addSub(`ci:${this.constructor.id}:test-suite:skippable`, ({ onDone }) => {
-
       if (!this.tracer._exporter || !this.tracer._exporter.getSkippableSuites) {
         return onDone({ err: new Error('CI Visibility was not initialized correctly') });
       }
@@ -79,9 +74,7 @@ export default class CiPlugin extends Plugin {
       });
     });
 
-
     this.addSub(`ci:${this.constructor.id}:session:start`, ({ command, frameworkVersion, rootDir }) => {
-
       const childOf = getTestParentSpan(this.tracer);
 
       const testSessionSpanMetadata = getTestSessionCommonTags(command, frameworkVersion, this.constructor.id);
@@ -93,11 +86,9 @@ export default class CiPlugin extends Plugin {
       // only for playwright
       this.rootDir = rootDir;
 
-
       this.testSessionSpan = this.tracer.startSpan(`${this.constructor.id}.test_session`, {
         childOf,
         tags: {
-
           [COMPONENT]: this.constructor.id,
           ...this.testEnvironmentMetadata,
           ...testSessionSpanMetadata,
@@ -107,7 +98,6 @@ export default class CiPlugin extends Plugin {
       this.testModuleSpan = this.tracer.startSpan(`${this.constructor.id}.test_module`, {
         childOf: this.testSessionSpan,
         tags: {
-
           [COMPONENT]: this.constructor.id,
           ...this.testEnvironmentMetadata,
           ...testModuleSpanMetadata,
@@ -115,19 +105,15 @@ export default class CiPlugin extends Plugin {
       });
     });
 
-
     this.addSub(`ci:${this.constructor.id}:itr:skipped-suites`, ({ skippedSuites, frameworkVersion }) => {
       const testCommand = this.testSessionSpan.context()._tags[TEST_COMMAND];
 
       skippedSuites.forEach((testSuite) => {
-
         const testSuiteMetadata = getTestSuiteCommonTags(testCommand, frameworkVersion, testSuite, this.constructor.id);
-
 
         this.tracer.startSpan(`${this.constructor.id}.test_suite`, {
           childOf: this.testModuleSpan,
           tags: {
-
             [COMPONENT]: this.constructor.id,
             ...this.testEnvironmentMetadata,
             ...testSuiteMetadata,
@@ -139,9 +125,7 @@ export default class CiPlugin extends Plugin {
     });
   }
 
-
   configure(config) {
-
     super.configure(config);
 
     this.testEnvironmentMetadata = getTestEnvironmentMetadata(this.constructor.id, this.config);
@@ -170,7 +154,6 @@ export default class CiPlugin extends Plugin {
     };
   }
 
-
   startTestSpan(
     testName,
     testSuite,
@@ -187,7 +170,6 @@ export default class CiPlugin extends Plugin {
     },
     extraTags = {},
   ) {
-
     const childOf = getTestParentSpan(this.tracer);
 
     let testTags = {
@@ -195,7 +177,6 @@ export default class CiPlugin extends Plugin {
         testName,
         testSuite,
         this.frameworkVersion,
-
         this.constructor.id,
       ),
 
@@ -231,9 +212,7 @@ export default class CiPlugin extends Plugin {
       };
     }
 
-
     const testSpan = this.tracer
-
       .startSpan(`${this.constructor.id}.test`, {
         childOf,
         tags: {

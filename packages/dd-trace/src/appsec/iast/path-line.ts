@@ -4,7 +4,7 @@ import { relative } from 'https://deno.land/std@0.204.0/path/relative.ts';
 import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
 import { calculateDDBasePath } from '../../util.ts';
 
-export {calculateDDBasePath};
+export { calculateDDBasePath };
 
 const EXCLUDED_PATHS = [
   join(SEP, 'node_modules', 'diagnostics_channel'),
@@ -19,7 +19,6 @@ const EXCLUDED_PATH_PREFIXES = [
 ];
 
 function getCallSiteInfo() {
-
   const previousPrepareStackTrace = Error.prepareStackTrace;
 
   const previousStackTraceLimit = Error.stackTraceLimit;
@@ -88,14 +87,12 @@ export function getFirstNonDDPathAndLine(externallyExcludedPaths: void) {
 }
 
 export function getNodeModulesPaths(...paths) {
-
   const nodeModulesPaths = [];
 
   paths.forEach((p) => {
     const pathParts = p.split('/');
     nodeModulesPaths.push(join('node_modules', ...pathParts));
   });
-
 
   return nodeModulesPaths;
 }
