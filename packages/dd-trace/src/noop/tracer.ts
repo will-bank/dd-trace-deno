@@ -1,14 +1,10 @@
-import Scope from '../noop/scope.ts';
-import Span from './span.ts';
+import { ITracer, User } from '../interfaces.ts';
+import NoopScope from './scope.ts';
+import NoopSpan from './span.ts';
 
-class NoopTracer {
-  private _scope: any;
-  private _span: any;
-
-  constructor(config) {
-    this._scope = new Scope();
-    this._span = new Span(this);
-  }
+export default class NoopTracer implements ITracer {
+  protected _scope = new NoopScope();
+  private _span = new NoopSpan(this);
 
   configure(options) {}
 
@@ -29,6 +25,7 @@ class NoopTracer {
   }
 
   setUrl() {
+    return this;
   }
 
   startSpan(name, options) {
@@ -38,12 +35,10 @@ class NoopTracer {
   inject(spanContext, format, carrier) {}
 
   extract(format, carrier) {
-    return this._span.context();
+    return this._span._context();
   }
 
-  setUser() {
+  setUser(user: User) {
     return this;
   }
 }
-
-export default NoopTracer;

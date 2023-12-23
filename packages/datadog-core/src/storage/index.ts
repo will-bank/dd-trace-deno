@@ -13,4 +13,10 @@
 //   module.exports = require('./async_hooks');
 // }
 
-export { default } from './async_hooks.ts';
+// export { default } from './async_hooks.ts';
+
+import { AsyncLocalStorage } from 'node:async_hooks';
+
+export default typeof AsyncLocalStorage.prototype.enterWith === 'function'
+  ? AsyncLocalStorage
+  : (await import('./async_local_storage.ts')).default;

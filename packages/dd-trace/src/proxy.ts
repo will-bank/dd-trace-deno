@@ -1,4 +1,4 @@
-import NoopProxy from './noop/proxy.ts';
+import NoopProxyTracer from './noop/proxy.ts';
 import DatadogTracer from './tracer.ts';
 import Config from './config.ts';
 import * as runtimeMetrics from './runtime_metrics.ts';
@@ -10,14 +10,15 @@ import * as remoteConfig from './appsec/remote_config/index.ts';
 import AppsecSdk from './appsec/sdk/index.ts';
 import * as dogstatsd from './dogstatsd.ts';
 import TracerProvider from './opentelemetry/tracer_provider.ts';
+import NoopAppsecSdk from './appsec/sdk/noop.ts';
+import { IAppsec } from './interfaces.ts';
 
-export default class ProxyTracer extends NoopProxy {
+export default class ProxyTracer extends NoopProxyTracer {
   private _initialized: boolean;
   private _pluginManager: PluginManager;
   dogstatsd: dogstatsd.NoopDogStatsDClient;
-  private _tracer: DatadogTracer;
-  appsec: any;
-  private _testApiManualPlugin: any;
+  appsec: IAppsec = new NoopAppsecSdk();
+  private _testApiManualPlugin?: TestApiManualPlugin;
   constructor() {
     super();
 
@@ -103,11 +104,7 @@ export default class ProxyTracer extends NoopProxy {
         setStartupLogPluginManager(this._pluginManager);
 
         if (config.isManualApiEnabled) {
-          const { default: TestApiManualPlugin } = await import(
-            './ci-visibility/test-api-manual/test-api-manual-plugin.ts'
-          );
-          this._testApiManualPlugin = new TestApiManualPlugin(this);
-          this._testApiManualPlugin.configure({ ...config, enabled: true });
+          log.error('Manual API is not supported');
         }
       }
     } catch (e) {

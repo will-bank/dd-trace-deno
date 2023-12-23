@@ -1,17 +1,15 @@
-class Scope {
+import { IScope, ISpan } from '../interfaces.ts';
+
+export default class NoopScope implements IScope {
   active() {
     return null;
   }
 
-  activate(span, callback: () => any) {
-    if (typeof callback !== 'function') return callback;
-
-    return callback();
+  activate<T>(span: ISpan, fn: (...args: any[]) => T): T {
+    return fn();
   }
 
-  bind(fn, span) {
+  bind<T>(fn: T, span?: ISpan | null): T {
     return fn;
   }
 }
-
-export default Scope;

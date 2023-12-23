@@ -125,7 +125,6 @@ function request(
     if (responseData) {
       errorMessage += ` Response from the endpoint: "${responseData}"`;
     }
-    console.log(options);
     const error = new Error(errorMessage);
 
     error.status = response.status;

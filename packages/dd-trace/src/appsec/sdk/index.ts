@@ -1,27 +1,28 @@
-import { trackCustomEvent, trackUserLoginFailureEvent, trackUserLoginSuccessEvent } from './track_event.ts';
-import { blockRequest, checkUserAndSetUser } from './user_blocking.ts';
+import { IAppsec, IAppsecMetadata, ITracer, User } from '../../interfaces.ts';
 import { setTemplates } from '../blocking.ts';
 import { setUser } from './set_user.ts';
+import { trackCustomEvent, trackUserLoginFailureEvent, trackUserLoginSuccessEvent } from './track_event.ts';
+import { blockRequest, checkUserAndSetUser } from './user_blocking.ts';
 
-class AppsecSdk {
-  private _tracer: any;
+export default class AppsecSdk implements IAppsec {
+  private _tracer: ITracer;
 
-  constructor(tracer, config) {
+  constructor(tracer: ITracer, config) {
     this._tracer = tracer;
     if (config) {
       setTemplates(config);
     }
   }
 
-  trackUserLoginSuccessEvent(user: { id: any }, metadata) {
+  trackUserLoginSuccessEvent(user: User, metadata?: IAppsecMetadata) {
     return trackUserLoginSuccessEvent(this._tracer, user, metadata);
   }
 
-  trackUserLoginFailureEvent(userId, exists, metadata) {
+  trackUserLoginFailureEvent(userId: string, exists: boolean, metadata?: IAppsecMetadata) {
     return trackUserLoginFailureEvent(this._tracer, userId, exists, metadata);
   }
 
-  trackCustomEvent(eventName, metadata) {
+  trackCustomEvent(eventName: string, metadata?: IAppsecMetadata) {
     return trackCustomEvent(this._tracer, eventName, metadata);
   }
 
@@ -29,13 +30,11 @@ class AppsecSdk {
     return checkUserAndSetUser(this._tracer, user);
   }
 
-  blockRequest(req, res) {
-    return blockRequest(this._tracer, req, res);
+  blockRequest(req?: Request) {
+    return blockRequest(this._tracer, req);
   }
 
   setUser(user: { id: any }) {
     return setUser(this._tracer, user);
   }
 }
-
-export default AppsecSdk;

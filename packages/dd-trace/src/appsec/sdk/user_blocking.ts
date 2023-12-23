@@ -5,6 +5,7 @@ import { block } from '../blocking.ts';
 import { storage } from '../../../../datadog-core/index.ts';
 import { setUserTags } from './set_user.ts';
 import log from '../../log/index.ts';
+import { ITracer } from '../../interfaces.ts';
 
 function isUserBlocked(user: { id: any }) {
   const actions = waf.run({ [USER_ID]: user.id });
@@ -15,7 +16,7 @@ function isUserBlocked(user: { id: any }) {
 }
 
 function checkUserAndSetUser(
-  tracer: { scope: () => { (): any; new (): any; active: { (): any; new (): any } } },
+  tracer: ITracer,
   user: { id: any },
 ) {
   if (!user || !user.id) {
@@ -35,29 +36,26 @@ function checkUserAndSetUser(
   return isUserBlocked(user);
 }
 
-function blockRequest(tracer: { scope: () => { (): any; new (): any; active: { (): any; new (): any } } }, req, res) {
-  if (!req || !res) {
+function blockRequest(tracer: ITracer, req?: Request) {
+  if (!req) {
     const store = storage.getStore();
     if (store) {
       req = req || store.req;
-      res = res || store.res;
     }
   }
 
-  if (!req || !res) {
+  if (!req) {
     log.warn('Requests or response object not available in blockRequest');
-    return false;
+    return null;
   }
 
   const rootSpan = getRootSpan(tracer);
   if (!rootSpan) {
     log.warn('Root span not available in blockRequest');
-    return false;
+    return null;
   }
 
-  block(req, res, rootSpan);
-
-  return true;
+  return block(req, rootSpan);
 }
 
 export { blockRequest, checkUserAndSetUser };

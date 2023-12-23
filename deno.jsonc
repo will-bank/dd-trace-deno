@@ -31,6 +31,6 @@
     "noExplicitAny": false
   },
   "tasks": {
-    "dev": "deno run --watch -A --unstable mod.ts"
+    "dev": "deno run --watch -A --unstable "
   }
 }

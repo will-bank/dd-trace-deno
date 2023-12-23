@@ -28,6 +28,7 @@ const { AUTO_KEEP } = priority;
 import packageJson from '../../../../../package.json.ts';
 import { relative } from 'https://deno.land/std@0.204.0/path/relative.ts';
 import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
+import { ITracer } from '../../interfaces.ts';
 const TEST_FRAMEWORK = 'test.framework';
 const TEST_FRAMEWORK_VERSION = 'test.framework_version';
 const TEST_TYPE = 'test.type';
@@ -234,7 +235,7 @@ function finishAllTraceSpans(
 }
 
 function getTestParentSpan(
-  tracer: { extract: (arg0: string, arg1: { 'x-datadog-trace-id': any; 'x-datadog-parent-id': string }) => any },
+  tracer: ITracer,
 ) {
   return tracer.extract('text_map', {
     'x-datadog-trace-id': id().toString(10),

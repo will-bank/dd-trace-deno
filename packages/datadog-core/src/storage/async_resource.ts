@@ -1,40 +1,18 @@
-'use strict';
-
-import v8 from 'node:v8';
-import { AsyncLocalStorage, createHook } from 'node:async_hooks';
+import { createHook } from 'node:async_hooks';
 import dc from 'node:diagnostics_channel';
+import { IStore } from '../../../dd-trace/src/interfaces.ts';
 
 const beforeCh = dc.channel('dd-trace:storage:before');
 const afterCh = dc.channel('dd-trace:storage:after');
 const enterCh = dc.channel('dd-trace:storage:enter');
 
-let PrivateSymbol = Symbol;
-function makePrivateSymbol() {
-  // eslint-disable-next-line no-new-func
-  PrivateSymbol = new Function('name', 'return %CreatePrivateSymbol(name)');
-}
+const kResourceStore = Symbol('ddResourceStore');
 
-try {
-  makePrivateSymbol();
-} catch (e) {
-  try {
-    v8.setFlagsFromString('--allow-natives-syntax');
-    makePrivateSymbol();
-    v8.setFlagsFromString('--no-allow-natives-syntax');
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
-}
+export type IResource = { [kResourceStore]?: unknown };
 
 export default abstract class AsyncResourceStorage {
-  #storage = new AsyncLocalStorage();
-  private _ddResourceStore: any;
-  private _enabled: boolean;
-  private _hook: any;
-  constructor() {
-    this._ddResourceStore = PrivateSymbol('ddResourceStore');
-    this._enabled = false;
-    this._hook = createHook(this._createHook());
-  }
+  private _enabled = false;
+  private _hook = createHook(this._createHook());
 
   disable() {
     if (!this._enabled) return;
@@ -43,36 +21,36 @@ export default abstract class AsyncResourceStorage {
     this._enabled = false;
   }
 
-  getStore() {
+  getStore(): IStore {
     if (!this._enabled) return;
 
     const resource = this._executionAsyncResource();
 
-    return resource[this._ddResourceStore];
+    return resource[kResourceStore];
   }
 
-  enterWith(store) {
+  enterWith(store: IStore) {
     this._enable();
 
     const resource = this._executionAsyncResource();
 
-    resource[this._ddResourceStore] = store;
+    resource[kResourceStore] = store;
     enterCh.publish();
   }
 
-  run(store, callback: (arg0: any) => any, ...args: any[]) {
+  run<T extends (...args: any[]) => any>(store: IStore, callback: T, ...args: Parameters<T>): ReturnType<T> | void {
     this._enable();
 
     const resource = this._executionAsyncResource();
-    const oldStore = resource[this._ddResourceStore];
+    const oldStore = resource[kResourceStore];
 
-    resource[this._ddResourceStore] = store;
+    resource[kResourceStore] = store;
     enterCh.publish();
 
     try {
       return callback(...args);
     } finally {
-      resource[this._ddResourceStore] = oldStore;
+      resource[kResourceStore] = oldStore;
       enterCh.publish();
     }
   }
@@ -96,14 +74,14 @@ export default abstract class AsyncResourceStorage {
     this._hook.enable();
   }
 
-  _init(asyncId, type, triggerAsyncId, resource: { [x: string]: any }) {
+  _init(asyncId: number, type: string, triggerAsyncId: number, resource: IResource) {
     const currentResource = this._executionAsyncResource();
 
-    if (Object.prototype.hasOwnProperty.call(currentResource, this._ddResourceStore)) {
-      resource[this._ddResourceStore] = currentResource[this._ddResourceStore];
+    if (Object.prototype.hasOwnProperty.call(currentResource, kResourceStore)) {
+      resource[kResourceStore] = currentResource[kResourceStore];
     }
   }
 
   // FIXME: executionAsyncResource is not available in Deno
-  abstract _executionAsyncResource();
+  abstract _executionAsyncResource(): IResource;
 }

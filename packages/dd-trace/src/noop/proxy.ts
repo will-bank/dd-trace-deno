@@ -2,20 +2,17 @@ import NoopTracer from './tracer.ts';
 import NoopAppsecSdk from '../appsec/sdk/noop.ts';
 import TracerProvider from '../opentelemetry/tracer_provider.ts';
 import Config from '../config.ts';
+import { IAppsec, ITracer, TracerOptions, User } from '../interfaces.ts';
 
-const noop = new NoopTracer();
-const noopAppsec = new NoopAppsecSdk();
+export default class NoopProxyTracer implements ITracer {
+  appsec: IAppsec = new NoopAppsecSdk();
 
-export default class Tracer {
-  private _tracer: any;
-  appsec: any;
-  constructor() {
-    this._tracer = noop;
-    this.appsec = noopAppsec;
-  }
+  constructor(
+    protected _tracer: NoopTracer = new NoopTracer(),
+  ) {}
 
-  async init(options: ConstructorParameters<typeof Config>[0]) {
-    return this;
+  init(options?: TracerOptions) {
+    return Promise.resolve(this);
   }
 
   use(...args: any[]) {
@@ -49,8 +46,7 @@ export default class Tracer {
   }
 
   setUrl(...args) {
-    this._tracer.setUrl(...args);
-    return this;
+    return this._tracer.setUrl(...args);
   }
 
   startSpan(...args) {
@@ -73,7 +69,7 @@ export default class Tracer {
     return this._tracer.getRumData(...args);
   }
 
-  setUser(user) {
+  setUser(user: User) {
     this.appsec.setUser(user);
     return this;
   }

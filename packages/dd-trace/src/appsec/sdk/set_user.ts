@@ -1,5 +1,6 @@
 import { getRootSpan } from './utils.ts';
 import log from '../../log/index.ts';
+import { ITracer, User } from '../../interfaces.ts';
 
 function setUserTags(user: object, rootSpan: { setTag: (arg0: string, arg1: string) => void }) {
   for (const k of Object.keys(user)) {
@@ -8,8 +9,8 @@ function setUserTags(user: object, rootSpan: { setTag: (arg0: string, arg1: stri
 }
 
 function setUser(
-  tracer: { scope: () => { (): any; new (): any; active: { (): any; new (): any } } },
-  user: { id: any },
+  tracer: ITracer,
+  user: User,
 ) {
   if (!user || !user.id) {
     log.warn('Invalid user provided to setUser');

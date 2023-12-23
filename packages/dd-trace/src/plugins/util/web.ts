@@ -1,14 +1,15 @@
 // @deno-types="https://esm.sh/@types/lodash@4.14.202/uniq"
-import uniq from 'https://esm.sh/lodash@4.17.21/uniq';
-import * as analyticsSampler from '../../analytics_sampler.ts';
-const FORMAT_HTTP_HEADERS = 'http_headers';
-import log from '../../log/index.ts';
+import * as kinds from 'https://esm.sh/dd-trace@4.13.1/ext/kinds.js';
 import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
 import * as types from 'https://esm.sh/dd-trace@4.13.1/ext/types.js';
-import * as kinds from 'https://esm.sh/dd-trace@4.13.1/ext/kinds.js';
-import urlFilter from './urlfilter.ts';
-import { extractIp } from './ip_extractor.ts';
+import uniq from 'https://esm.sh/lodash@4.17.21/uniq';
+import * as analyticsSampler from '../../analytics_sampler.ts';
 import { ERROR_MESSAGE, ERROR_STACK, ERROR_TYPE } from '../../constants.ts';
+import { ITracer } from '../../interfaces.ts';
+import log from '../../log/index.ts';
+import { extractIp } from './ip_extractor.ts';
+import urlFilter from './urlfilter.ts';
+const FORMAT_HTTP_HEADERS = 'http_headers';
 
 const WEB = types.WEB;
 const SERVER = kinds.SERVER;
@@ -128,9 +129,9 @@ const web = {
   },
   // Start a span and activate a scope for a request.
   instrument(
-    tracer: { scope: () => { (): any; new (): any; activate: { (arg0: any, arg1: () => any): any; new (): any } } },
+    tracer: ITracer,
     config,
-    req,
+    req: Request,
     res,
     name,
     callback: (arg0: any) => any,
@@ -195,16 +196,7 @@ const web = {
   bindAndWrapMiddlewareErrors(
     fn,
     req,
-    tracer: {
-      scope: () => {
-        (): any;
-        new (): any;
-        bind: {
-          (arg0: any, arg1: any): { (): any; new (): any; apply: { (arg0: any, arg1: IArguments): any; new (): any } };
-          new (): any;
-        };
-      };
-    },
+    tracer: ITracer,
     activeSpan,
   ) {
     try {
@@ -285,8 +277,8 @@ const web = {
 
   // Extract the parent span from the headers and start a new span as its child
   startChildSpan(
-    tracer: { extract: (arg0: string, arg1: any) => any; startSpan: (arg0: any, arg1: { childOf: any }) => any },
-    name,
+    tracer: ITracer,
+    name: string,
     headers,
   ) {
     const childOf = tracer.extract(FORMAT_HTTP_HEADERS, headers);

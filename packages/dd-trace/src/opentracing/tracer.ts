@@ -11,11 +11,12 @@ import log from '../log/index.ts';
 import * as runtimeMetrics from '../runtime_metrics.ts';
 import getExporter from '../exporter.ts';
 import SpanContext from './span_context.ts';
+import { ITracer } from '../interfaces.ts';
 
 const REFERENCE_CHILD_OF = 'child_of';
 const REFERENCE_FOLLOWS_FROM = 'follows_from';
 
-export default class DatadogTracer {
+export default class DatadogTracer implements ITracer {
   private _service: any;
   private _version: any;
   private _env: any;

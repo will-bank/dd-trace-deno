@@ -1,10 +1,8 @@
-'use strict';
-
 import { executionAsyncId } from 'node:async_hooks';
-import AsyncResourceStorage from './async_resource.ts';
+import AsyncResourceStorage, { IResource } from './async_resource.ts';
 
 export default class AsyncHooksStorage extends AsyncResourceStorage {
-  private _resources = new Map();
+  private _resources = new Map<number, IResource>();
 
   disable() {
     super.disable();
@@ -19,25 +17,23 @@ export default class AsyncHooksStorage extends AsyncResourceStorage {
     };
   }
 
-  _init(asyncId, type, triggerAsyncId, resource) {
-    super._init.apply(this, arguments);
+  _init(asyncId: number, type: string, triggerAsyncId: number, resource: IResource) {
+    super._init(asyncId, type, triggerAsyncId, resource);
 
     this._resources.set(asyncId, resource);
   }
 
-  _destroy(asyncId) {
+  _destroy(asyncId: number) {
     this._resources.delete(asyncId);
   }
 
   override _executionAsyncResource() {
     const asyncId = executionAsyncId();
 
-    let resource = this._resources.get(asyncId);
-
-    if (!resource) {
-      this._resources.set(asyncId, resource = {});
+    if (!this._resources.has(asyncId)) {
+      this._resources.set(asyncId, {});
     }
 
-    return resource;
+    return this._resources.get(asyncId);
   }
 }

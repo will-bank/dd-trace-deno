@@ -3,11 +3,12 @@ import { getRootSpan } from './utils.ts';
 import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
 const { MANUAL_KEEP } = tags;
 import { setUserTags } from './set_user.ts';
+import { IAppsecMetadata, ITracer, User } from '../../interfaces.ts';
 
 function trackUserLoginSuccessEvent(
-  tracer: { scope: () => { (): any; new (): any; active: { (): any; new (): any } } },
-  user: { id: any },
-  metadata,
+  tracer: ITracer,
+  user: User,
+  metadata?: IAppsecMetadata,
 ) {
   // TODO: better user check here and in _setUser() ?
   if (!user || !user.id) {
@@ -27,10 +28,10 @@ function trackUserLoginSuccessEvent(
 }
 
 function trackUserLoginFailureEvent(
-  tracer: { scope: () => { (): any; new (): any; active: { (): any; new (): any } } },
-  userId,
-  exists,
-  metadata,
+  tracer: ITracer,
+  userId: string,
+  exists: boolean,
+  metadata?: IAppsecMetadata,
 ) {
   if (!userId || typeof userId !== 'string') {
     log.warn('Invalid userId provided to trackUserLoginFailureEvent');
@@ -47,22 +48,22 @@ function trackUserLoginFailureEvent(
 }
 
 function trackCustomEvent(
-  tracer: { scope: () => { (): any; new (): any; active: { (): any; new (): any } } },
-  eventName,
-  metadata,
+  tracer: ITracer,
+  eventName: string,
+  metadata?: IAppsecMetadata,
 ) {
   if (!eventName || typeof eventName !== 'string') {
     log.warn('Invalid eventName provided to trackCustomEvent');
     return;
   }
 
-  trackEvent(eventName, metadata, 'trackCustomEvent', getRootSpan(tracer), 'sdk');
+  trackEvent(eventName, metadata ?? {}, 'trackCustomEvent', getRootSpan(tracer), 'sdk');
 }
 
 function trackEvent(
-  eventName,
-  fields: object,
-  sdkMethodName,
+  eventName: string,
+  fields: IAppsecMetadata,
+  sdkMethodName: string,
   rootSpan: { addTags: (arg0: { [x: string]: string; [x: number]: string }) => void },
   mode: string,
 ) {

@@ -1,51 +1,64 @@
-import NoopSpanContext from './span_context.ts';
-import id from '../id.ts';
 import { storage } from '../../../datadog-core/index.ts'; // TODO: noop storage?
+import id from '../id.ts';
+import { ISpan, IStore, ITracer } from '../interfaces.ts';
+import Span from '../opentelemetry/span.ts';
+import NoopSpanContext from './span_context.ts';
 
-class NoopSpan {
-  public _store: any;
-  public _noopTracer: any;
-  public _noopContext: NoopSpanContext;
-  constructor(tracer, parent: { _traceId: any; _spanId: any; _baggageItems: any }) {
+export default class NoopSpan implements ISpan {
+  protected _store: IStore;
+  private readonly _noopContext: NoopSpanContext;
+
+  readonly _context: ISpan['_context'];
+  readonly _tracer: ISpan['_tracer'];
+
+  constructor(
+    _tracer: ITracer,
+    parent?: NoopSpan,
+  ) {
     this._store = storage.getStore();
-    this._noopTracer = tracer;
     this._noopContext = this._createContext(parent);
+    this._context = () => this._noopContext;
+    this._tracer = () => _tracer;
   }
 
-  context() {
-    return this._noopContext;
-  }
-  tracer() {
-    return this._noopTracer;
-  }
-  setOperationName(name) {
+  setOperationName(name: string) {
     return this;
   }
-  setBaggageItem(key, value) {
+
+  setBaggageItem(key: string, value: unknown) {
     return this;
   }
-  getBaggageItem(key) {}
-  setTag(key, value) {
+
+  getBaggageItem(key: string) {
+    return undefined;
+  }
+
+  setTag(key: string, value: unknown) {
     return this;
   }
-  addTags(keyValueMap) {
+
+  addTags(keyValueMap: object) {
     return this;
   }
+
   log() {
     return this;
   }
-  logEvent() {}
-  finish(finishTime) {}
 
-  _createContext(parent: { _traceId: any; _spanId: any; _baggageItems: any }) {
+  logEvent() {}
+
+  finish(finishTime: number) {}
+
+  _createContext(parent?: NoopSpan) {
     const spanId = id();
 
     if (parent) {
+      const parentContext = parent._context();
       return new NoopSpanContext({
         noop: this,
-        traceId: parent._traceId,
+        traceId: parentContext.toTraceId(),
         spanId,
-        parentId: parent._spanId,
+        parentId: parentContext.toSpanId(),
         baggageItems: Object.assign({}, parent._baggageItems),
       });
     } else {
@@ -57,5 +70,3 @@ class NoopSpan {
     }
   }
 }
-
-export default NoopSpan;
