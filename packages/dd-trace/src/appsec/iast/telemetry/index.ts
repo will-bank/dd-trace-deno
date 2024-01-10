@@ -1,5 +1,5 @@
-import telemetryMetrics from '../../../telemetry/metrics.ts';
-import telemetryLogs from './log/index.ts';
+import * as telemetryMetrics from '../../../telemetry/metrics.ts';
+import * as telemetryLogs from './log/index.ts';
 import { getVerbosity, Verbosity } from './verbosity.ts';
 import { finalizeRequestNamespace, globalNamespace, initRequestNamespace } from './namespaces.ts';
 

@@ -1,4 +1,3 @@
-import waf from './waf/index.ts';
 import { ACKNOWLEDGED, ERROR } from './remote_config/apply_states.ts';
 import * as blocking from './blocking.ts';
 
@@ -13,8 +12,6 @@ let appliedActions = new Map();
 
 function applyRules(rules: { actions: { find: (arg0: (action: any) => boolean) => any } }, config) {
   defaultRules = rules;
-
-  waf.init(rules, config);
 
   if (rules.actions) {
     blocking.updateBlockingConfiguration(rules.actions.find((action: { id: string }) => action.id === 'block'));
@@ -126,8 +123,6 @@ function updateWafFromRC({ toUnapply, toApply, toModify }) {
     }
 
     try {
-      waf.update(payload);
-
       if (newRulesData.modified) {
         appliedRulesData = newRulesData;
       }
@@ -244,7 +239,6 @@ function copyRulesData(rulesData) {
 }
 
 function clearAllRules() {
-  waf.destroy();
   blocking.updateBlockingConfiguration(undefined);
 
   defaultRules = undefined;

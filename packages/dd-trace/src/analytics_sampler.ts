@@ -1,4 +1,4 @@
-import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/tags.js';
 
 export function sample(
   span: {

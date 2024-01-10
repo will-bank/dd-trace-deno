@@ -1,12 +1,11 @@
 import InjectionAnalyzer from './injection-analyzer.ts';
 import { UNVALIDATED_REDIRECT } from '../vulnerabilities.ts';
 import { getNodeModulesPaths } from '../path-line.ts';
-import { getRanges } from '../taint-tracking/operations.ts';
-const {
+import {
   HTTP_REQUEST_HEADER_VALUE,
   HTTP_REQUEST_PATH,
   HTTP_REQUEST_PATH_PARAM,
-} = await import('../taint-tracking/source-types');
+} from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/packages/dd-trace/src/appsec/iast/taint-tracking/source-types.js';
 
 const EXCLUDED_PATHS = getNodeModulesPaths('express/lib/response.js');
 
@@ -36,10 +35,8 @@ class UnvalidatedRedirectAnalyzer extends InjectionAnalyzer {
       rootSpan?: { context: () => { (): any; new (): any; toSpanId: { (): any; new (): any } } };
     },
   ) {
-    if (!value) return false;
-
-    const ranges = getRanges(iastContext, value);
-    return ranges && ranges.length > 0 && !this._areSafeRanges(ranges);
+    // FIXME: taint-tracking is not supported
+    return false;
   }
 
   // Do not report vulnerability if ranges sources are exclusively url,

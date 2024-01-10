@@ -1,6 +1,6 @@
 import log from '../../log/index.ts';
 import { getRootSpan } from './utils.ts';
-import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/tags.js';
 const { MANUAL_KEEP } = tags;
 import { setUserTags } from './set_user.ts';
 import { IAppsecMetadata, ITracer, User } from '../../interfaces.ts';

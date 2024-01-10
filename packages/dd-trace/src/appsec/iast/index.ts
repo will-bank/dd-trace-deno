@@ -5,15 +5,8 @@ import { storage } from '../../../../datadog-core/index.ts';
 import * as overheadController from './overhead-controller.ts';
 import dc from 'node:diagnostics_channel';
 import * as iastContextFunctions from './iast-context.ts';
-import {
-  createTransaction,
-  disableTaintTracking,
-  enableTaintTracking,
-  removeTransaction,
-  taintTrackingPlugin,
-} from './taint-tracking/index.ts';
 import { IAST_ENABLED_TAG_KEY } from './tags.ts';
-import * as iastTelemetry from '../telemetry.ts';
+import iastTelemetry from './telemetry/index.ts';
 
 // TODO Change to `apm:http:server:request:[start|close]` when the subscription
 //  order of the callbacks can be enforce
@@ -24,7 +17,6 @@ const iastResponseEnd = dc.channel('datadog:iast:response-end');
 function enable(config: { iast: { telemetryVerbosity: any } }, _tracer) {
   iastTelemetry.configure(config, config.iast && config.iast.telemetryVerbosity);
   enableAllAnalyzers(config);
-  enableTaintTracking(config.iast, iastTelemetry.verbosity);
   requestStart.subscribe(onIncomingHttpRequestStart);
   requestClose.subscribe(onIncomingHttpRequestEnd);
   overheadController.configure(config.iast);
@@ -35,7 +27,6 @@ function enable(config: { iast: { telemetryVerbosity: any } }, _tracer) {
 function disable() {
   iastTelemetry.stop();
   disableAllAnalyzers();
-  disableTaintTracking();
   overheadController.finishGlobalContext();
   if (requestStart.hasSubscribers) requestStart.unsubscribe(onIncomingHttpRequestStart);
   if (requestClose.hasSubscribers) requestClose.unsubscribe(onIncomingHttpRequestEnd);
@@ -52,10 +43,8 @@ function onIncomingHttpRequestStart(data: { req: any }) {
         const isRequestAcquired = overheadController.acquireRequest(rootSpan);
         if (isRequestAcquired) {
           const iastContext = iastContextFunctions.saveIastContext(store, topContext, { rootSpan, req: data.req });
-          createTransaction(rootSpan.context().toSpanId(), iastContext);
           overheadController.initializeRequestContext(iastContext);
           iastTelemetry.onRequestStart(iastContext);
-          taintTrackingPlugin.taintRequest(data.req, iastContext);
         }
         if (rootSpan.addTags) {
           rootSpan.addTags({
@@ -78,7 +67,6 @@ function onIncomingHttpRequestEnd(data: { req: any }) {
       const vulnerabilities = iastContext.vulnerabilities;
       const rootSpan = iastContext.rootSpan;
       vulnerabilityReporter.sendVulnerabilities(vulnerabilities, rootSpan);
-      removeTransaction(iastContext);
       iastTelemetry.onRequestEnd(iastContext, iastContext.rootSpan);
     }
     // TODO web.getContext(data.req) is required when the request is aborted

@@ -1,5 +1,3 @@
-import { USER_ID } from '../addresses.ts';
-import waf from '../waf/index.ts';
 import { getRootSpan } from './utils.ts';
 import { block } from '../blocking.ts';
 import { storage } from '../../../../datadog-core/index.ts';
@@ -8,11 +6,7 @@ import log from '../../log/index.ts';
 import { ITracer } from '../../interfaces.ts';
 
 function isUserBlocked(user: { id: any }) {
-  const actions = waf.run({ [USER_ID]: user.id });
-
-  if (!actions) return false;
-
-  return actions.includes('block');
+  log.warn('WAF is not supported');
 }
 
 function checkUserAndSetUser(

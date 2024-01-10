@@ -1,6 +1,10 @@
+import * as tags from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/tags.js';
+import { storage } from '../../../datadog-core/index.ts';
 import log from '../log/index.ts';
-import * as RuleManager from './rule_manager.ts';
-import * as remoteConfig from './remote_config/index.ts';
+import { extractIp } from '../plugins/util/ip_extractor.ts';
+import web from '../plugins/util/web.ts';
+import * as addresses from './addresses.ts';
+import { setTemplates } from './blocking.ts';
 import {
   bodyParser,
   graphqlFinishExecute,
@@ -9,17 +13,12 @@ import {
   passportVerify,
   queryParser,
 } from './channels.ts';
-import waf from './waf/index.ts';
-import * as addresses from './addresses.ts';
-import * as Reporter from './reporter.ts';
-import * as appsecTelemetry from './telemetry.ts';
-import web from '../plugins/util/web.ts';
-import { extractIp } from '../plugins/util/ip_extractor.ts';
-import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
-const { HTTP_CLIENT_IP } = tags;
-import { block, setTemplates } from './blocking.ts';
 import { passportTrackEvent } from './passport.ts';
-import { storage } from '../../../datadog-core/index.ts';
+import * as remoteConfig from './remote_config/index.ts';
+import * as Reporter from './reporter.ts';
+import * as RuleManager from './rule_manager.ts';
+import * as appsecTelemetry from './telemetry.ts';
+const { HTTP_CLIENT_IP } = tags;
 
 let isEnabled = false;
 let config;
@@ -83,9 +82,7 @@ function incomingHttpStartTranslator({ req, res, abortController }) {
     payload[addresses.HTTP_CLIENT_IP] = clientIp;
   }
 
-  const actions = waf.run(payload, req);
-
-  handleResults(actions, req, res, rootSpan, abortController);
+  log.warn('WAF is not supported');
 }
 
 function incomingHttpEndTranslator({ req, res }) {
@@ -117,10 +114,6 @@ function incomingHttpEndTranslator({ req, res }) {
     }
   }
 
-  waf.run(payload, req);
-
-  waf.disposeContext(req);
-
   Reporter.finishRequest(req, res);
 }
 
@@ -130,11 +123,7 @@ function onRequestBodyParsed({ req, res, abortController }) {
 
   if (req.body === undefined || req.body === null) return;
 
-  const results = waf.run({
-    [addresses.HTTP_INCOMING_BODY]: req.body,
-  }, req);
-
-  handleResults(results, req, res, rootSpan, abortController);
+  log.warn('WAF is not supported');
 }
 
 function onRequestQueryParsed({ req, res, abortController }) {
@@ -143,11 +132,7 @@ function onRequestQueryParsed({ req, res, abortController }) {
 
   if (!req.query || typeof req.query !== 'object') return;
 
-  const results = waf.run({
-    [addresses.HTTP_INCOMING_QUERY]: req.query,
-  }, req);
-
-  handleResults(results, req, res, rootSpan, abortController);
+  log.warn('WAF is not supported');
 }
 
 function onPassportVerify({ credentials, user }) {
@@ -172,16 +157,7 @@ function onGraphqlFinishExecute({ context }) {
 
   if (!resolvers || typeof resolvers !== 'object') return;
 
-  // Don't collect blocking result because it only works in monitor mode.
-  waf.run({ [addresses.HTTP_INCOMING_GRAPHQL_RESOLVERS]: resolvers }, req);
-}
-
-function handleResults(actions: { includes: (arg0: string) => any }, req, res, rootSpan, abortController) {
-  if (!actions || !req || !res || !rootSpan || !abortController) return;
-
-  if (actions.includes('block')) {
-    block(req, res, rootSpan, abortController);
-  }
+  log.warn('WAF is not supported');
 }
 
 function disable() {

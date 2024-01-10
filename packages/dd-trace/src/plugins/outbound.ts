@@ -1,9 +1,9 @@
-const {
+import {
   CLIENT_PORT_KEY,
   PEER_SERVICE_KEY,
   PEER_SERVICE_SOURCE_KEY,
   PEER_SERVICE_REMAP_KEY,
-} = await import('../constants');
+} from '../constants.ts';
 import TracingPlugin from './tracing.ts';
 
 const COMMON_PEER_SVC_SOURCE_TAGS = [

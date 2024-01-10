@@ -6,7 +6,7 @@ import iastTelemetry from './telemetry/index.ts';
 import { EXECUTED_SOURCE, getExecutedMetric, getInstrumentedMetric, TagKey } from './telemetry/iast-metric.ts';
 import { storage } from '../../../../datadog-core/index.ts';
 import { getIastContext } from './iast-context.ts';
-import instrumentations from 'https://esm.sh/dd-trace@4.13.1/packages/datadog-instrumentations/src/helpers/instrumentations.js';
+import instrumentations from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/packages/datadog-instrumentations/src/helpers/instrumentations.js';
 
 /**
  * Used by vulnerability sources and sinks to subscribe diagnostic channel events

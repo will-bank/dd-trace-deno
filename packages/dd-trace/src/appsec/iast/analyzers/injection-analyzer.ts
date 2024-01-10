@@ -1,11 +1,8 @@
 import Analyzer from './vulnerability-analyzer.ts';
-import { getRanges, isTainted } from '../taint-tracking/operations.ts';
 
 class InjectionAnalyzer extends Analyzer {
   _isVulnerable(value, iastContext: { [x: string]: any }) {
-    if (value) {
-      return isTainted(iastContext, value);
-    }
+    // FIXME: taint-tracking is not supported
     return false;
   }
 
@@ -16,8 +13,8 @@ class InjectionAnalyzer extends Analyzer {
       rootSpan?: { context: () => { (): any; new (): any; toSpanId: { (): any; new (): any } } };
     },
   ) {
-    const ranges = getRanges(iastContext, value);
-    return { value, ranges };
+    // FIXME: taint-tracking is not supported
+    return { value, ranges: [] };
   }
 }
 

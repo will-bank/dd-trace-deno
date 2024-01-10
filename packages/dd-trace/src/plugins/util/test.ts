@@ -20,10 +20,10 @@ import {
 } from './tags.ts';
 import id from '../../id.ts';
 
-import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/tags.js';
 const { RESOURCE_NAME, SAMPLING_PRIORITY, SPAN_TYPE } = tags;
 import { SAMPLING_RULE_DECISION } from '../../constants.ts';
-import * as priority from 'https://esm.sh/dd-trace@4.13.1/ext/priority.js';
+import * as priority from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/priority.js';
 const { AUTO_KEEP } = priority;
 import packageJson from '../../../../../package.json.ts';
 import { relative } from 'https://deno.land/std@0.204.0/path/relative.ts';

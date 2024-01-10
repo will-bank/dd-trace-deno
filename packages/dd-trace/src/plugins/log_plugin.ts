@@ -1,4 +1,4 @@
-import { LOG } from 'https://esm.sh/dd-trace@4.13.1/ext/formats.js';
+import { LOG } from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/formats.js';
 import Plugin from './plugin.ts';
 import { storage } from '../../../datadog-core/index.ts';
 

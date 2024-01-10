@@ -1,4 +1,4 @@
-import * as exporters from 'https://esm.sh/dd-trace@4.13.1/ext/exporters.js';
+import * as exporters from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/exporters.js';
 import { existsSync } from 'https://deno.land/std@0.204.0/fs/exists.ts';
 import * as constants from './constants.ts';
 

@@ -1,4 +1,4 @@
-import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/tags.js';
 import packageJson from '../../../package.json.ts';
 import { LogCollapsingLowestDenseDDSketch } from 'https://esm.sh/@datadog/sketches-js@2.1.0';
 import { ORIGIN_KEY, TOP_LEVEL_KEY } from './constants.ts';

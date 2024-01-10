@@ -7,7 +7,7 @@ import Nomenclature from './service-naming/index.ts';
 const loadChannel = dc.channel('dd-trace:instrumentation:load');
 
 // instrument everything that needs Plugin System V2 instrumentation
-// import 'https://esm.sh/dd-trace@4.13.1/packages/datadog-instrumentations/index.js';
+// import 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/packages/datadog-instrumentations/index.js';
 
 const DD_TRACE_DISABLED_PLUGINS = Deno.env.get('DD_TRACE_DISABLED_PLUGINS');
 
@@ -24,7 +24,7 @@ loadChannel.subscribe(({ name }) => {
 });
 
 // Globals
-// maybeEnable((await import('https://esm.sh/dd-trace@4.13.1/packages/datadog-plugin-fetch/src/index.js')).default);
+// maybeEnable((await import('https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/packages/datadog-plugin-fetch/src/index.js')).default);
 maybeEnable((await import('./plugins/log_plugin.ts')).default);
 
 function maybeEnable(Plugin: { id: string }) {

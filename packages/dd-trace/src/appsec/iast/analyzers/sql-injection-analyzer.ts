@@ -1,6 +1,5 @@
 import InjectionAnalyzer from './injection-analyzer.ts';
 import { SQL_INJECTION } from '../vulnerabilities.ts';
-import { getRanges } from '../taint-tracking/operations.ts';
 import { storage } from '../../../../../datadog-core/index.ts';
 import { getIastContext } from '../iast-context.ts';
 import { addVulnerability } from '../vulnerability-reporter.ts';
@@ -57,8 +56,8 @@ class SqlInjectionAnalyzer extends InjectionAnalyzer {
     iastContext: { rootSpan: { context: () => { (): any; new (): any; toSpanId: { (): any; new (): any } } } },
     dialect: string,
   ) {
-    const ranges = getRanges(iastContext, value);
-    return { value, ranges, dialect };
+    // FIXME: taint-tracking is not supported
+    return { value, ranges: [], dialect };
   }
 
   analyze(value, dialect: string, store = storage.getStore()) {

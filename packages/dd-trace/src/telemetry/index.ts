@@ -3,7 +3,7 @@ import packageJson from '../../../../package.json.ts';
 import Config from '../config.ts';
 import { sendData } from './send-data.ts';
 
-const { manager: metricsManager } = await import('./metrics.ts');
+import { manager as metricsManager } from './metrics.ts';
 
 const telemetryStartChannel = dc.channel('datadog:telemetry:start');
 const telemetryStopChannel = dc.channel('datadog:telemetry:stop');

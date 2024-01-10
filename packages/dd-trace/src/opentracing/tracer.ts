@@ -5,7 +5,7 @@ import TextMapPropagator from './propagation/text_map.ts';
 import HttpPropagator from './propagation/http.ts';
 import BinaryPropagator from './propagation/binary.ts';
 import LogPropagator from './propagation/log.ts';
-import * as formats from 'https://esm.sh/dd-trace@4.13.1/ext/formats.js';
+import * as formats from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/formats.js';
 
 import log from '../log/index.ts';
 import * as runtimeMetrics from '../runtime_metrics.ts';

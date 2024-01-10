@@ -5,7 +5,7 @@ import DatadogSpanContext from '../span_context.ts';
 import log from '../../log/index.ts';
 import TraceState from './tracestate.ts';
 
-import * as priority from 'https://esm.sh/dd-trace@4.13.1/ext/priority.js';
+import * as priority from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/priority.js';
 const { AUTO_KEEP, AUTO_REJECT, USER_KEEP } = priority;
 
 const traceKey = 'x-datadog-trace-id';

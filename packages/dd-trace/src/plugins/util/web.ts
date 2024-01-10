@@ -1,7 +1,7 @@
 // @deno-types="https://esm.sh/@types/lodash@4.14.202/uniq"
-import * as kinds from 'https://esm.sh/dd-trace@4.13.1/ext/kinds.js';
-import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
-import * as types from 'https://esm.sh/dd-trace@4.13.1/ext/types.js';
+import * as kinds from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/kinds.js';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/tags.js';
+import * as types from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/types.js';
 import uniq from 'https://esm.sh/lodash@4.17.21/uniq';
 import * as analyticsSampler from '../../analytics_sampler.ts';
 import { ERROR_MESSAGE, ERROR_STACK, ERROR_TYPE } from '../../constants.ts';

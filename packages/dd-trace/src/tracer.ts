@@ -1,5 +1,5 @@
 import Tracer from './opentracing/tracer.ts';
-import * as tags from 'https://esm.sh/dd-trace@4.13.1/ext/tags.js';
+import * as tags from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/ext/tags.js';
 import Scope from './scope.ts';
 import { storage } from '../../datadog-core/index.ts';
 import { isError } from './util.ts';
@@ -7,7 +7,7 @@ import { setStartupLogConfig } from './startup-log.ts';
 import { ERROR_MESSAGE, ERROR_STACK, ERROR_TYPE } from '../../dd-trace/src/constants.ts';
 import { DataStreamsProcessor } from './datastreams/processor.ts';
 import { decodePathwayContext } from './datastreams/pathway.ts';
-import * as version from 'https://esm.sh/dd-trace@4.13.1/version.js';
+import * as version from 'https://esm.sh/dd-trace@4.13.1&pin=v135&no-dts/version.js';
 
 import * as DataStreamsContext from './data_streams_context.ts';
 
