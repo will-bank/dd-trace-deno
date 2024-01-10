@@ -16,15 +16,13 @@ import { IAppsec } from './interfaces.ts';
 export default class ProxyTracer extends NoopProxyTracer {
   private _initialized: boolean;
   private _pluginManager: PluginManager;
-  dogstatsd: dogstatsd.NoopDogStatsDClient;
+  dogstatsd = dogstatsd.CustomMetrics.noop();
   appsec: IAppsec = new NoopAppsecSdk();
-  private _testApiManualPlugin?: TestApiManualPlugin;
   constructor() {
     super();
 
     this._initialized = false;
     this._pluginManager = new PluginManager(this);
-    this.dogstatsd = new dogstatsd.NoopDogStatsDClient();
   }
 
   async init(options): Promise<this> {
@@ -35,16 +33,16 @@ export default class ProxyTracer extends NoopProxyTracer {
     try {
       const config = new Config(options); // TODO: support dynamic code config
 
-      // if (config.dogstatsd) {
-      //   // Custom Metrics
-      //   this.dogstatsd = new dogstatsd.CustomMetrics(config);
+      if (config.dogstatsd) {
+        // Custom Metrics
+        this.dogstatsd = dogstatsd.CustomMetrics.forConfig(config);
 
-      //   Deno.unrefTimer(
-      //     setInterval(() => {
-      //       this.dogstatsd.flush();
-      //     }, 10 * 1000)
-      //   );
-      // }
+        Deno.unrefTimer(
+          setInterval(() => {
+            this.dogstatsd.flush();
+          }, 10 * 1000),
+        );
+      }
 
       if (config.remoteConfig.enabled && !config.isCiVisibility) {
         const rc = remoteConfig.enable(config);

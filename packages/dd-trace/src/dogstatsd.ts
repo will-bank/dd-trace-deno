@@ -1,29 +1,35 @@
 import { lookup } from 'node:dns'; // cache to avoid instrumentation
 import { Buffer } from 'node:buffer';
 import request from './exporters/common/request.ts';
-import dgram from 'node:dgram';
 import { isIP } from 'node:net';
 import log from './log/index.ts';
-
-const MAX_BUFFER_SIZE = 1024; // limit from the agent
+import { IDogStatsD, IDogStatsDTags } from './interfaces.ts';
 
 const TYPE_COUNTER = 'c';
 const TYPE_GAUGE = 'g';
 const TYPE_DISTRIBUTION = 'd';
 
-class DogStatsDClient {
-  private _httpOptions: { url: any; path: string };
-  private _host: any;
-  private _family: any;
-  private _port: any;
-  private _prefix: any;
-  private _tags: any;
-  private _queue: any[];
-  private _buffer: string;
-  private _offset: number;
-  private _udp4: any;
-  private _udp6: any;
-  constructor(options = {}) {
+const encoder = new TextEncoder();
+
+type DogStatsDClientOptions = {
+  metricsProxyUrl?: URL | string;
+  host?: string;
+  port?: number;
+  prefix?: string;
+  tags?: IDogStatsDTags;
+};
+
+class DogStatsDClient implements IDogStatsD {
+  private _httpOptions?: { url: string; path: string };
+  private _host: string;
+  private _family: number;
+  private _port: number;
+  private _prefix: string;
+  private _tags: IDogStatsDTags;
+  private _queue: Uint8Array[];
+  private _udp4: Deno.DatagramConn;
+  private _udp6: Deno.DatagramConn;
+  constructor(options: DogStatsDClientOptions = {}) {
     if (options.metricsProxyUrl) {
       this._httpOptions = {
         url: options.metricsProxyUrl.toString(),
@@ -37,8 +43,6 @@ class DogStatsDClient {
     this._prefix = options.prefix || '';
     this._tags = options.tags || [];
     this._queue = [];
-    this._buffer = '';
-    this._offset = 0;
     this._udp4 = Deno.listenDatagram({
       transport: 'udp',
       hostname: '127.0.0.1',
@@ -51,74 +55,101 @@ class DogStatsDClient {
     });
   }
 
-  increment(stat, value, tags: any[]) {
+  increment(stat: string, value = 1, tags?: IDogStatsDTags) {
     this._add(stat, value, TYPE_COUNTER, tags);
   }
 
-  gauge(stat, value, tags: any[]) {
+  decrement(stat: string, value = 1, tags?: IDogStatsDTags): void {
+    this._add(stat, -value, TYPE_COUNTER, tags);
+  }
+
+  gauge(stat: string, value: number, tags?: IDogStatsDTags) {
     this._add(stat, value, TYPE_GAUGE, tags);
   }
 
-  distribution(stat, value, tags: any[]) {
+  distribution(stat: string, value: number, tags?: IDogStatsDTags) {
     this._add(stat, value, TYPE_DISTRIBUTION, tags);
   }
 
   flush() {
-    const queue = this._enqueue();
+    const queue = this._queue;
 
     log.debug(`Flushing ${queue.length} metrics via ${this._httpOptions ? 'HTTP' : 'UDP'}`);
 
-    if (this._queue.length === 0) return;
+    if (this._queue.length === 0) {
+      return;
+    }
 
     this._queue = [];
 
-    if (this._httpOptions) {
-      this._sendHttp(queue);
-    } else {
-      this._sendUdp(queue);
-    }
+    const request = this._httpOptions ? this._sendHttp(queue) : this._sendUdp(queue);
+
+    request.catch((err) => {
+      log.error(err);
+    });
   }
 
-  _sendHttp(queue: any[]) {
+  _sendHttp(queue: Uint8Array[]) {
     const buffer = Buffer.concat(queue);
-    request(buffer, this._httpOptions, (err: { stack: string; status: number }) => {
-      if (err) {
+
+    return new Promise<void>((resolve, reject) => {
+      request(buffer, {
+        method: 'POST',
+        ...this._httpOptions,
+      }, (err: { stack: string; status: number }) => {
+        if (!err) {
+          resolve();
+          return;
+        }
+
         log.error('HTTP error from agent: ' + err.stack);
+
         if (err.status) {
           // Inside this if-block, we have connectivity to the agent, but
           // we're not getting a 200 from the proxy endpoint. If it's a 404,
           // then we know we'll never have the endpoint, so just clear out the
           // options. Either way, we can give UDP a try.
           if (err.status === 404) {
-            this._httpOptions = null;
+            this._httpOptions = undefined;
           }
-          this._sendUdp(queue);
+          resolve(this._sendUdp(queue));
+        } else {
+          reject(err);
         }
-      }
+      });
     });
   }
 
-  _sendUdp(queue: any[]) {
+  _sendUdp(queue: Uint8Array[]) {
     if (this._family !== 0) {
-      this._sendUdpFromQueue(queue, this._host, this._family);
-    } else {
+      return this._sendUdpFromQueue(queue, this._host, this._family);
+    }
+
+    return new Promise<void>((resolve, reject) => {
       lookup(this._host, (err, address, family: number) => {
-        if (err) return log.error(err);
-        this._sendUdpFromQueue(queue, address, family);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this._sendUdpFromQueue(queue, address, family));
+        }
+      });
+    });
+  }
+
+  async _sendUdpFromQueue(queue: Uint8Array[], address: string, family: number) {
+    const socket = family === 6 ? this._udp6 : this._udp4;
+
+    for (const buffer of queue) {
+      log.debug(`Sending to DogStatsD: ${buffer}`);
+      await socket.send(buffer, {
+        transport: 'udp',
+        hostname: address,
+        port: this._port,
       });
     }
   }
 
-  _sendUdpFromQueue(queue: any[], address, family: number) {
-    const socket = family === 6 ? this._udp6 : this._udp4;
-
-    queue.forEach((buffer: string | any[]) => {
-      log.debug(`Sending to DogStatsD: ${buffer}`);
-      socket.send(buffer, 0, buffer.length, this._port, address);
-    });
-  }
-
-  _add(stat, value, type: string, tags: any[]) {
+  _add(stat: string, value: number, type: string, tags?: IDogStatsDTags) {
     const message = `${this._prefix + stat}:${value}|${type}`;
 
     tags = tags ? this._tags.concat(tags) : this._tags;
@@ -131,28 +162,13 @@ class DogStatsDClient {
   }
 
   _write(message: string) {
-    const offset = Buffer.byteLength(message);
-
-    if (this._offset + offset > MAX_BUFFER_SIZE) {
-      this._enqueue();
-    }
-
-    this._offset += offset;
-    this._buffer += message;
-  }
-
-  _enqueue() {
-    if (this._offset > 0) {
-      this._queue.push(new TextEncoder().encode(this._buffer));
-      this._buffer = '';
-      this._offset = 0;
-    }
-
-    return this._queue;
+    this._queue.push(
+      encoder.encode(message),
+    );
   }
 
   static generateClientConfig(config = {}) {
-    const tags: string[] = [];
+    const tags: IDogStatsDTags = [];
 
     if (config.tags) {
       Object.keys(config.tags)
@@ -186,50 +202,61 @@ class DogStatsDClient {
   }
 }
 
-class NoopDogStatsDClient {
-  gauge() {}
-
-  increment() {}
-
-  distribution() {}
-
-  flush() {}
+class NoopDogStatsDClient implements IDogStatsD {
+  increment(stat: string, value?: number, tags?: IDogStatsDTags): void {
+  }
+  decrement(stat: string, value?: number, tags?: IDogStatsDTags): void {
+  }
+  distribution(stat: string, value?: number, tags?: IDogStatsDTags): void {
+  }
+  gauge(stat: string, value?: number, tags?: IDogStatsDTags): void {
+  }
+  flush(): void {
+  }
 }
 
 // This is a simplified user-facing proxy to the underlying DogStatsDClient instance
 class CustomMetrics {
-  dogstatsd: any;
-  constructor(config) {
-    const clientConfig = DogStatsDClient.generateClientConfig(config);
-    this.dogstatsd = new DogStatsDClient(clientConfig);
+  constructor(readonly dogstatsd?: IDogStatsD) {
   }
 
-  increment(stat, value = 1, tags) {
-    return this.dogstatsd.increment(
+  static noop(): CustomMetrics {
+    return new CustomMetrics();
+  }
+
+  static forConfig(config): CustomMetrics {
+    const clientConfig = DogStatsDClient.generateClientConfig(config);
+    const dogstatsd = new DogStatsDClient(clientConfig);
+
+    return new CustomMetrics(dogstatsd);
+  }
+
+  increment(stat: string, value = 1, tags?: Record<string, unknown>) {
+    return this.dogstatsd?.increment(
       stat,
       value,
       CustomMetrics.tagTranslator(tags),
     );
   }
 
-  decrement(stat, value = 1, tags) {
-    return this.dogstatsd.increment(
+  decrement(stat: string, value = 1, tags?: Record<string, unknown>) {
+    return this.dogstatsd?.increment(
       stat,
       value * -1,
       CustomMetrics.tagTranslator(tags),
     );
   }
 
-  gauge(stat, value, tags) {
-    return this.dogstatsd.gauge(
+  gauge(stat: string, value: number, tags?: Record<string, unknown>) {
+    return this.dogstatsd?.gauge(
       stat,
       value,
       CustomMetrics.tagTranslator(tags),
     );
   }
 
-  distribution(stat, value, tags) {
-    return this.dogstatsd.distribution(
+  distribution(stat: string, value: number, tags?: Record<string, unknown>) {
+    return this.dogstatsd?.distribution(
       stat,
       value,
       CustomMetrics.tagTranslator(tags),
@@ -237,15 +264,15 @@ class CustomMetrics {
   }
 
   flush() {
-    return this.dogstatsd.flush();
+    return this.dogstatsd?.flush();
   }
 
   /**
    * Exposing { tagName: 'tagValue' } to the end user
    * These are translated into [ 'tagName:tagValue' ] for internal use
    */
-  static tagTranslator(objTags) {
-    const arrTags: string[] = [];
+  static tagTranslator(objTags?: Record<string, unknown>) {
+    const arrTags: IDogStatsDTags = [];
 
     if (!objTags) return arrTags;
 

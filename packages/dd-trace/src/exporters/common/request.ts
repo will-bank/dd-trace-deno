@@ -46,6 +46,7 @@ export const isWritable = () => activeRequests < maxActiveRequests;
 function request(
   data: BodyInit,
   options: {
+    method: string;
     headers: Record<string, string>;
     url: string;
     socketPath: string;

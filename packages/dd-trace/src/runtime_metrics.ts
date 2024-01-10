@@ -8,11 +8,11 @@ import log from './log/index.ts';
 const INTERVAL = 10 * 1000;
 const START_TIME = Date.now();
 
-let interval;
-let client;
-let gauges;
-let counters;
-let histograms;
+let interval: number;
+let client: DogStatsDClient;
+let gauges: Record<string, Map<string, number>>;
+let counters: Record<string, Map<string, number>>;
+let histograms: Record<string, Map<string, Histogram>>;
 
 reset();
 
@@ -37,7 +37,7 @@ export function stop() {
 }
 
 export function boolean(name, value, tag) {
-  this.gauge(name, value ? 1 : 0, tag);
+  gauge(name, value ? 1 : 0, tag);
 }
 
 export function histogram(name: string | number, value, tag) {
@@ -109,7 +109,7 @@ function reset() {
 
 function captureCpuUsage() {
   const [avg1min] = Deno.loadavg();
-  client.gauge('runtime.deno.cpu.total', avg1min.toFixed(2));
+  client.gauge('runtime.deno.cpu.total', parseFloat(avg1min.toFixed(2)));
 }
 
 function captureMemoryUsage() {
@@ -164,7 +164,7 @@ function captureHeapSpace() {
 function captureGauges() {
   Object.keys(gauges).forEach((name) => {
     gauges[name].forEach((value, tag) => {
-      client.gauge(name, value, tag && [tag]);
+      client.gauge(name, value, tag ? [tag] : []);
     });
   });
 }
@@ -172,7 +172,7 @@ function captureGauges() {
 function captureCounters() {
   Object.keys(counters).forEach((name) => {
     counters[name].forEach((value, tag) => {
-      client.increment(name, value, tag && [tag]);
+      client.increment(name, value, tag ? [tag] : []);
     });
   });
 
@@ -182,7 +182,7 @@ function captureCounters() {
 function captureHistograms() {
   Object.keys(histograms).forEach((name) => {
     histograms[name].forEach((stats: { reset: () => void }, tag) => {
-      _histogram(name, stats, tag && [tag]);
+      _histogram(name, stats, tag ? [tag] : []);
       stats.reset();
     });
   });

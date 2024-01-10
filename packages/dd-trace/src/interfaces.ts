@@ -669,6 +669,8 @@ export interface User {
   [key: string]: string | undefined;
 }
 
+export type IDogStatsDTags = string[];
+
 export interface IDogStatsD {
   /**
    * Increments a metric by the specified value, optionally specifying tags.
@@ -676,7 +678,7 @@ export interface IDogStatsD {
    * @param {number} value The amount to increment the stat by.
    * @param {[tag:string]:string|number} tags Tags to pass along, such as `{ foo: 'bar' }`. Values are combined with config.tags.
    */
-  increment(stat: string, value?: number, tags?: { [tag: string]: string | number }): void;
+  increment(stat: string, value?: number, tags?: IDogStatsDTags): void;
 
   /**
    * Decrements a metric by the specified value, optionally specifying tags.
@@ -684,7 +686,7 @@ export interface IDogStatsD {
    * @param {number} value The amount to decrement the stat by.
    * @param {[tag:string]:string|number} tags Tags to pass along, such as `{ foo: 'bar' }`. Values are combined with config.tags.
    */
-  decrement(stat: string, value?: number, tags?: { [tag: string]: string | number }): void;
+  decrement(stat: string, value?: number, tags?: IDogStatsDTags): void;
 
   /**
    * Sets a distribution value, optionally specifying tags.
@@ -692,7 +694,7 @@ export interface IDogStatsD {
    * @param {number} value The amount to increment the stat by.
    * @param {[tag:string]:string|number} tags Tags to pass along, such as `{ foo: 'bar' }`. Values are combined with config.tags.
    */
-  distribution(stat: string, value?: number, tags?: { [tag: string]: string | number }): void;
+  distribution(stat: string, value?: number, tags?: IDogStatsDTags): void;
 
   /**
    * Sets a gauge value, optionally specifying tags.
@@ -700,7 +702,7 @@ export interface IDogStatsD {
    * @param {number} value The amount to increment the stat by.
    * @param {[tag:string]:string|number} tags Tags to pass along, such as `{ foo: 'bar' }`. Values are combined with config.tags.
    */
-  gauge(stat: string, value?: number, tags?: { [tag: string]: string | number }): void;
+  gauge(stat: string, value?: number, tags?: IDogStatsDTags): void;
 
   /**
    * Forces any unsent metrics to be sent
