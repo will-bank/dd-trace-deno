@@ -6,7 +6,6 @@ import Histogram from './histogram.ts';
 import log from './log/index.ts';
 
 const INTERVAL = 10 * 1000;
-const START_TIME = Date.now();
 
 let interval: number;
 let client: DogStatsDClient;
@@ -28,11 +27,15 @@ export function start(config) {
     client.flush();
   }, INTERVAL);
 
+  // Experimental: count unhandled rejections
+  addEventListener('unhandledrejection', captureUnhandledRejections);
+
   Deno.unrefTimer(interval);
 }
 
 export function stop() {
   clearInterval(interval);
+  removeEventListener('unhandledrejection', captureUnhandledRejections);
   reset();
 }
 
@@ -116,16 +119,22 @@ function captureMemoryUsage() {
   const usage = Deno.memoryUsage();
   const system = Deno.systemMemoryInfo();
 
-  client.gauge('runtime.deno.mem.heap_total', usage.heapTotal);
-  client.gauge('runtime.deno.mem.heap_used', usage.heapUsed);
-  client.gauge('runtime.deno.mem.rss', usage.rss);
-  client.gauge('runtime.deno.mem.total', system.total);
-  client.gauge('runtime.deno.mem.free', system.free);
-  client.gauge('runtime.deno.mem.external', usage.external);
+  client.gauge('runtime.deno.mem.usage.heap_total', usage.heapTotal);
+  client.gauge('runtime.deno.mem.usage.heap_used', usage.heapUsed);
+  client.gauge('runtime.deno.mem.usage.rss', usage.rss);
+  client.gauge('runtime.deno.mem.usage.external', usage.external);
+
+  client.gauge('runtime.deno.mem.system.total', system.total);
+  client.gauge('runtime.deno.mem.system.free', system.free);
+  client.gauge('runtime.deno.mem.system.available', system.available);
+  client.gauge('runtime.deno.mem.system.buffers', system.buffers);
+  client.gauge('runtime.deno.mem.system.cached', system.cached);
+  client.gauge('runtime.deno.mem.system.swap_total', system.swapTotal);
+  client.gauge('runtime.deno.mem.system.swap_free', system.swapFree);
 }
 
 function captureProcess() {
-  client.gauge('runtime.deno.process.uptime', Math.round(Date.now() - START_TIME / 1000));
+  client.gauge('runtime.deno.process.uptime', Math.round(performance.now() / 1000));
 }
 
 function captureHeapStats() {
@@ -136,9 +145,28 @@ function captureHeapStats() {
   client.gauge('runtime.deno.heap.total_physical_size', stats.total_physical_size);
   client.gauge('runtime.deno.heap.total_available_size', stats.total_available_size);
   client.gauge('runtime.deno.heap.heap_size_limit', stats.heap_size_limit);
+  client.gauge('runtime.deno.heap.used_heap_size', stats.used_heap_size);
+  client.gauge('runtime.deno.heap.malloced_memory', stats.malloced_memory);
+  client.gauge('runtime.deno.heap.peak_malloced_memory', stats.peak_malloced_memory);
 
-  stats.malloced_memory && client.gauge('runtime.deno.heap.malloced_memory', stats.malloced_memory);
-  stats.peak_malloced_memory && client.gauge('runtime.deno.heap.peak_malloced_memory', stats.peak_malloced_memory);
+  client.gauge('runtime.deno.heap.number_of_native_contexts', stats.number_of_native_contexts);
+  client.gauge('runtime.deno.heap.number_of_detached_contexts', stats.number_of_detached_contexts);
+
+  if ('total_global_handles_size' in stats) {
+    client.gauge('runtime.deno.heap.total_global_handles_size', stats.total_global_handles_size as number);
+  }
+
+  if ('used_global_handles_size' in stats) {
+    client.gauge('runtime.deno.heap.used_global_handles_size', stats.used_global_handles_size as number);
+  }
+
+  if (stats.malloced_memory) {
+    client.gauge('runtime.deno.heap.malloced_memory', stats.malloced_memory);
+  }
+
+  if (stats.peak_malloced_memory) {
+    client.gauge('runtime.deno.heap.peak_malloced_memory', stats.peak_malloced_memory);
+  }
 }
 
 function captureHeapSpace() {
@@ -186,6 +214,11 @@ function captureHistograms() {
       stats.reset();
     });
   });
+}
+
+function captureUnhandledRejections(event: PromiseRejectionEvent) {
+  client.increment('runtime.deno.unhandledrejections');
+  client.flush();
 }
 
 function captureCommonMetrics() {
