@@ -61,7 +61,15 @@ export default class AsyncLocalStoragePolyfill<T> implements AsyncLocalStorage<T
 // deno-lint-ignore-file prefer-primordials
 
 const { core } = Deno[Deno.internal];
-const { ops } = core;
+
+const op_node_is_promise_rejected = (() => {
+  const REJECTED = 2;
+
+  return (promise: Promise<unknown>): boolean => {
+    const [promiseState] = core.getPromiseDetails(promise);
+    return promiseState === REJECTED;
+  }
+})();
 
 const asyncContextStack: AsyncContextFrame[] = [];
 
@@ -105,7 +113,7 @@ function setPromiseHooks() {
   };
   const after = (promise: Promise<unknown>) => {
     popAsyncFrame();
-    if (!ops.op_node_is_promise_rejected(promise)) {
+    if (!op_node_is_promise_rejected(promise)) {
       // @ts-ignore promise async context
       promise[asyncContext] = undefined;
     }
@@ -113,7 +121,7 @@ function setPromiseHooks() {
   const resolve = (promise: Promise<unknown>) => {
     const currentFrame = AsyncContextFrame.current();
     if (
-      !currentFrame.isRoot() && ops.op_node_is_promise_rejected(promise) &&
+      !currentFrame.isRoot() && op_node_is_promise_rejected(promise) &&
       typeof promise[asyncContext] === "undefined"
     ) {
       AsyncContextFrame.attachContext(promise);
