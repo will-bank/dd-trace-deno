@@ -1,6 +1,5 @@
 import { existsSync } from 'https://deno.land/std@0.204.0/fs/exists.ts';
 import log from './log/index.ts';
-import coalesce from 'https://esm.sh/koalas@1.0.2';
 import * as tagger from './tagger.ts';
 import { isFalse, isTrue } from './util.ts';
 import { GIT_COMMIT_SHA, GIT_REPOSITORY_URL } from './plugins/util/tags.ts';
@@ -8,6 +7,10 @@ import { getGitMetadataFromGitProperties } from './git_properties.ts';
 import { updateConfig } from './telemetry/index.ts';
 import { getIsAzureFunctionConsumptionPlan, getIsGCPFunction } from './serverless.ts';
 import recommendedJson from './appsec/recommended.json' assert { type: 'json' };
+
+const coalesce = (...values: unknown[]) => values.find(value =>
+  value !== undefined && value !== null && value !== Number.NaN
+);
 
 const fromEntries = Object.fromEntries ||
   ((entries: any[]) => entries.reduce((obj, [k, v]) => Object.assign(obj, { [k]: v }), {}));
@@ -110,7 +113,7 @@ export default class Config {
   service?: string;
   serviceMapping: any;
   version?: string;
-  dogstatsd: { hostname: any; port: string };
+  dogstatsd: { hostname: string; port: number };
   runtimeMetrics: boolean;
   tracePropagationStyle: { inject: any; extract: any };
   experimental: { runtimeId: boolean; exporter: any; enableGetRumData: boolean };
@@ -203,7 +206,7 @@ export default class Config {
       appsec?: any;
       remoteConfig?: any;
       ingestion?: any;
-      dogstatsd?: any;
+      dogstatsd?: { hostname?: string; port?: number };
       rateLimit?: any;
       samplingRules?: any;
       spanSamplingRules?: any;
@@ -678,7 +681,7 @@ ken|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)
     this.version = DD_VERSION;
     this.dogstatsd = {
       hostname: coalesce(dogstatsd.hostname, Deno.env.get('DD_DOGSTATSD_HOSTNAME'), this.hostname),
-      port: String(coalesce(dogstatsd.port, Deno.env.get('DD_DOGSTATSD_PORT'), 8125)),
+      port: Number(coalesce(dogstatsd.port, Deno.env.get('DD_DOGSTATSD_PORT'), 8125)),
     };
     this.runtimeMetrics = isTrue(DD_RUNTIME_METRICS_ENABLED);
     this.tracePropagationStyle = {

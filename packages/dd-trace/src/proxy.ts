@@ -8,7 +8,7 @@ import * as telemetry from './telemetry/index.ts';
 import PluginManager from './plugin_manager.ts';
 import * as remoteConfig from './appsec/remote_config/index.ts';
 import AppsecSdk from './appsec/sdk/index.ts';
-import * as dogstatsd from './dogstatsd.ts';
+import { CustomMetrics } from './dogstatsd.ts';
 import TracerProvider from './opentelemetry/tracer_provider.ts';
 import NoopAppsecSdk from './appsec/sdk/noop.ts';
 import { IAppsec } from './interfaces.ts';
@@ -16,7 +16,7 @@ import { IAppsec } from './interfaces.ts';
 export default class ProxyTracer extends NoopProxyTracer {
   private _initialized: boolean;
   private _pluginManager: PluginManager;
-  dogstatsd = dogstatsd.CustomMetrics.noop();
+  dogstatsd = CustomMetrics.noop();
   appsec: IAppsec = new NoopAppsecSdk();
   constructor() {
     super();
@@ -33,15 +33,20 @@ export default class ProxyTracer extends NoopProxyTracer {
     try {
       const config = new Config(options); // TODO: support dynamic code config
 
-      if (config.dogstatsd) {
-        // Custom Metrics
-        this.dogstatsd = dogstatsd.CustomMetrics.forConfig(config);
+      try {
+        if (config.dogstatsd) {
+          // Custom Metrics
+          this.dogstatsd = CustomMetrics.forConfig(config);
 
-        Deno.unrefTimer(
-          setInterval(() => {
-            this.dogstatsd.flush();
-          }, 10 * 1000),
-        );
+          Deno.unrefTimer(
+            setInterval(() => {
+              this.dogstatsd.flush();
+            }, 10 * 1000),
+          );
+        }
+      } catch (e) {
+        console.error('Error initializing dogstatsd', e);
+        log.error(e);
       }
 
       if (config.remoteConfig.enabled && !config.isCiVisibility) {

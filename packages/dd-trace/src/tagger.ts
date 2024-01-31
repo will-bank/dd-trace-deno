@@ -1,13 +1,14 @@
 import log from './log/index.ts';
 
 function add(
-  carrier: { [x: string]: string },
-  keyValuePairs: { forEach: (arg0: (tags: any) => void) => any; split: (arg0: string) => any },
+  carrier?: Record<string, string>,
+  keyValuePairs?: string | string[] | Record<string, string>,
 ) {
   if (!carrier || !keyValuePairs) return;
 
   if (Array.isArray(keyValuePairs)) {
-    return keyValuePairs.forEach((tags) => add(carrier, tags));
+    keyValuePairs.forEach((tags) => add(carrier, tags));
+    return;
   }
 
   try {

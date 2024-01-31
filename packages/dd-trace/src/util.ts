@@ -1,11 +1,19 @@
 import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
 
-export function isTrue(str: string) {
+export function isTrue(str: string | boolean) {
+  if (typeof str === 'boolean') {
+    return str;
+  }
+
   str = String(str).toLowerCase();
   return str === 'true' || str === '1';
 }
 
-export function isFalse(str: string) {
+export function isFalse(str: string | boolean) {
+  if (typeof str === 'boolean') {
+    return !str;
+  }
+
   str = String(str).toLowerCase();
   return str === 'false' || str === '0';
 }

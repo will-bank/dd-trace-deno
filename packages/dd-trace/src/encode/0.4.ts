@@ -2,7 +2,6 @@ import { normalizeSpan, truncateSpan } from './tags-processors.ts';
 import Chunk from './chunk.ts';
 import log from '../log/index.ts';
 import { isTrue } from '../util.ts';
-import coalesce from 'https://esm.sh/koalas@1.0.2';
 import { Buffer } from 'node:buffer';
 
 const SOFT_LIMIT = 8 * 1024 * 1024; // 8MB
@@ -34,10 +33,9 @@ class AgentEncoder {
     this._stringBytes = new Chunk();
     this._writer = writer;
     this._reset();
-    this._debugEncoding = isTrue(coalesce(
-      Deno.env.get('DD_TRACE_ENCODING_DEBUG'),
-      false,
-    ));
+    this._debugEncoding = isTrue(
+      Deno.env.get('DD_TRACE_ENCODING_DEBUG') ?? false,
+    );
   }
 
   count() {
