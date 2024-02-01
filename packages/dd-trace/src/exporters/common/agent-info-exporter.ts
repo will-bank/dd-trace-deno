@@ -58,7 +58,7 @@ class AgentInfoExporter {
 
     const { flushInterval } = this._config;
 
-    if (flushInterval === 0) {
+    if (!flushInterval) {
       writer.flush();
     } else if (flushInterval > 0 && !this[timerKey]) {
       this[timerKey] = setTimeout(() => {

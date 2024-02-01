@@ -34,16 +34,14 @@ export default class ProxyTracer extends NoopProxyTracer {
       const config = new Config(options); // TODO: support dynamic code config
 
       try {
-        if (config.dogstatsd) {
-          // Custom Metrics
-          this.dogstatsd = CustomMetrics.forConfig(config);
+        // Custom Metrics
+        this.dogstatsd = CustomMetrics.forConfig(config);
 
-          Deno.unrefTimer(
-            setInterval(() => {
-              this.dogstatsd.flush();
-            }, 10 * 1000),
-          );
-        }
+        Deno.unrefTimer(
+          setInterval(() => {
+            this.dogstatsd.flush();
+          }, 10 * 1000),
+        );
       } catch (e) {
         console.error('Error initializing dogstatsd', e);
         log.error(e);

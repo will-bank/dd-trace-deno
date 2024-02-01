@@ -8,9 +8,16 @@ import { updateConfig } from './telemetry/index.ts';
 import { getIsAzureFunctionConsumptionPlan, getIsGCPFunction } from './serverless.ts';
 import recommendedJson from './appsec/recommended.json' assert { type: 'json' };
 
-const coalesce = (...values: unknown[]) => values.find(value =>
-  value !== undefined && value !== null && value !== Number.NaN
-);
+const coalesce = <T extends unknown, L>(...values: [...T[], L]): NonNullable<T> | L => {
+  const result = values.find((value) =>
+    value !== undefined &&
+    value !== null &&
+    value !== '' &&
+    !Number.isNaN(value)
+  );
+
+  return result ?? values[values.length - 1] as L;
+}
 
 const fromEntries = Object.fromEntries ||
   ((entries: any[]) => entries.reduce((obj, [k, v]) => Object.assign(obj, { [k]: v }), {}));
@@ -104,8 +111,8 @@ export default class Config {
   site?: string;
   hostname?: string;
   port: string;
-  flushInterval: any;
-  flushMinSpans: any;
+  flushInterval?: number;
+  flushMinSpans?: number;
   queryStringObfuscation: any;
   clientIpEnabled: any;
   clientIpHeader: any;
@@ -190,7 +197,7 @@ export default class Config {
       startupLogs?: any;
       openAiLogsEnabled?: any;
       protocolVersion?: any;
-      flushMinSpans?: any;
+      flushMinSpans?: number;
       clientIpEnabled?: any;
       clientIpHeader?: any;
       experimental?: any;
@@ -211,7 +218,7 @@ export default class Config {
       samplingRules?: any;
       spanSamplingRules?: any;
       site?: any;
-      flushInterval?: any;
+      flushInterval?: number;
       plugins?: any;
       reportHostname?: any;
       lookup?: any;
@@ -671,7 +678,7 @@ ken|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)
     this.hostname = DD_AGENT_HOST || (this.url && this.url.hostname);
     this.port = String(DD_TRACE_AGENT_PORT || (this.url && this.url.port));
     this.flushInterval = coalesce(parseInt(options.flushInterval, 10), defaultFlushInterval);
-    this.flushMinSpans = DD_TRACE_PARTIAL_FLUSH_MIN_SPANS;
+    this.flushMinSpans = DD_TRACE_PARTIAL_FLUSH_MIN_SPANS ?? 1000;
     this.queryStringObfuscation = DD_TRACE_OBFUSCATION_QUERY_STRING_REGEXP;
     this.clientIpEnabled = DD_TRACE_CLIENT_IP_ENABLED;
     this.clientIpHeader = DD_TRACE_CLIENT_IP_HEADER;

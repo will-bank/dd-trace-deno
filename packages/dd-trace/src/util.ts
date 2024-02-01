@@ -1,6 +1,6 @@
 import { SEP } from 'https://deno.land/std@0.204.0/path/separator.ts';
 
-export function isTrue(str: string | boolean) {
+export function isTrue(str?: string | boolean) {
   if (typeof str === 'boolean') {
     return str;
   }
@@ -9,7 +9,7 @@ export function isTrue(str: string | boolean) {
   return str === 'true' || str === '1';
 }
 
-export function isFalse(str: string | boolean) {
+export function isFalse(str?: string | boolean) {
   if (typeof str === 'boolean') {
     return !str;
   }
